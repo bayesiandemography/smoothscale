@@ -1,0 +1,77 @@
+---
+title: "overview"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{overview}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(smoothscale)
+```
+
+```{r}
+syn_census
+```
+
+
+```{r}
+smooth_counts(count = syn_census$child_labour,
+              population = syn_census$all_children)
+```
+
+```{r}
+library(dplyr)
+census <- syn_census %>%
+  mutate(child_labour_sm = smooth_counts(count = child_labour,
+                                         population = all_children))
+census
+```
+
+```{r}
+library(ggplot2)
+library(tidyr)
+data_for_plot <- census %>%
+  pivot_longer(col = c(child_labour, child_labour_sm),
+               names_to = "measure") %>%
+  mutate(prevalence = value / all_children)
+ggplot(data_for_plot,
+       aes(x = prevalence, y = area, color = measure)) +
+  facet_grid(vars(age), vars(sex)) +
+  geom_point()
+```
+
+
+
+```{r}
+census2 <- syn_census %>%
+  group_by(age, sex) %>%
+  mutate(child_labour_sm = smooth_counts(count = child_labour,
+                                         population = all_children))
+census2
+```
+
+
+
+```{r}
+library(ggplot2)
+library(tidyr)
+library(forcats)
+data_for_plot2 <- census2 %>%
+  pivot_longer(col = c(child_labour, child_labour_sm),
+               names_to = "measure") %>%
+  mutate(prevalence = value / all_children) %>%
+  mutate(area = reorder(area, prevalence))
+ggplot(data_for_plot,
+       aes(x = prevalence, y = area, color = measure)) +
+  facet_grid(vars(age), vars(sex)) +
+  geom_point()
+```
