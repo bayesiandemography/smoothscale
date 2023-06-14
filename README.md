@@ -18,15 +18,7 @@ devtools::install_github("bayesiandemography/smoothscale")
 
 ``` r
 library(smoothscale)
-library(dplyr)
-#> 
-#> Attaching package: 'dplyr'
-#> The following objects are masked from 'package:stats':
-#> 
-#>     filter, lag
-#> The following objects are masked from 'package:base':
-#> 
-#>     intersect, setdiff, setequal, union
+library(dplyr, warn.conflicts = FALSE)
 syn_census %>%
   mutate(child_labour_sm = smooth_counts(count = child_labour,
                                          population = all_children))
