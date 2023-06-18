@@ -24,25 +24,28 @@ syn_census
 
 
 ```{r}
-smooth_counts(count = syn_census$child_labour,
+smooth_count(count = syn_census$child_labour,
               population = syn_census$all_children)
 ```
 
 ```{r}
 library(dplyr)
+library(tidyr)
+library(forcats)
 census <- syn_census %>%
-  mutate(child_labour_sm = smooth_counts(count = child_labour,
+  mutate(child_labour_sm = smooth_count(count = child_labour,
                                          population = all_children))
 census
 ```
 
-```{r}
+```{r, fig.width = 7, fig.height = 7}
 library(ggplot2)
 library(tidyr)
 data_for_plot <- census %>%
   pivot_longer(col = c(child_labour, child_labour_sm),
                names_to = "measure") %>%
-  mutate(prevalence = value / all_children)
+  mutate(prevalence = value / all_children) %>%
+  mutate(area = fct_reorder(area, prevalence))
 ggplot(data_for_plot,
        aes(x = prevalence, y = area, color = measure)) +
   facet_grid(vars(age), vars(sex)) +
@@ -54,7 +57,7 @@ ggplot(data_for_plot,
 ```{r}
 census2 <- syn_census %>%
   group_by(age, sex) %>%
-  mutate(child_labour_sm = smooth_counts(count = child_labour,
+  mutate(child_labour_sm = smooth_count(count = child_labour,
                                          population = all_children))
 census2
 ```

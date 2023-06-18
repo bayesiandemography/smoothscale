@@ -5,32 +5,43 @@ library(tidyr)
 
 set.seed(0)
 
-n_area <- 20
-prior_count <- 5
+n_area <- 50
+mean_area_effect_popn <- 6
+sd_area_effect_popn <- 1.5
+sd_agesex_popn <- 0.05
 
-mean_popn <- data.frame(area = sprintf("Area %02.0f", seq_len(n_area)),
-                        mean_popn = seq(from = 5, by = 5, length.out = n_area),
-                        area_prev = exp(runif(n = n_area, min = -0.25, max = 0.25)))
-
-mean_prev <- expand_grid(age = c("5-9", "10-14"),
-                         sex = c("Female", "Male")) %>%
-    mutate(mean_prev = c(0.2, 0.22, 0.3, 0.32))
+sd_area_effect_prev <- 0.05
+sd_agesex_prev <- 0.0001
+sd_area_agesex_prev <- 0.0001
 
 
-syn_census <- expand_grid(area = sprintf("Area %02.0f", seq_len(n_area)),
-                          age = c("5-9", "10-14"),
-                          sex = c("Female", "Male")) %>%
-    inner_join(mean_popn, by = "area") %>%
-    inner_join(mean_prev, by = c("age", "sex")) %>%
-    mutate(all_children = rnbinom(n = n(),
-                                  size = 1,
-                                  mu = mean_popn) + 2,
-           prev = rbeta(n = n(),
-                     shape1 = mean_prev * prior_count,
-                     shape2 = (1 - mean_prev) * prior_count),
-           prev = area_prev * prev,
-           prev = pmin(pmax(prev, 0.05), 0.95),
-           child_labour = rbinom(n = n(),
+area <- sprintf("Area %02.0f", seq_len(n_area))
+
+area_effect_popn <- data.frame(area = area,
+                               effect = rnorm(n = n_area,
+                                              mean = mean_area_effect_popn,
+                                              sd = sd_area_effect_popn))
+popn <- expand_grid(age = c("5-9", "10-14"),
+                         sex = c("Female", "Male"),
+                         area = area) %>%
+    inner_join(area_effect_popn, by = "area") %>%
+    mutate(all_children = rlnorm(n = n(), meanlog = effect, sdlog = sd_agesex_popn),
+           all_children = round(all_children))
+
+area_effect_prev <- data.frame(area = area,
+                               area_effect = rnorm(n = n_area,
+                                                   sd = sd_area_effect_prev))
+agesex_effect_prev <- expand_grid(age = c("5-9", "10-14"),
+                                  sex = c("Female", "Male")) %>%
+    mutate(agesex_effect = c(0.25, 0.27, 0.3, 0.32))
+
+prev <- cross_join(area_effect_prev, agesex_effect_prev) %>%
+    mutate(prev = rnorm(n = n(),
+                        mean = area_effect + agesex_effect,
+                        sd = sd_area_agesex_prev))
+
+syn_census <- inner_join(popn, prev, by = c("area", "age", "sex")) %>%
+    mutate(child_labour = rbinom(n = n(),
                                  size = all_children,
                                  prob = prev)) %>%
     select(area, age, sex, child_labour, all_children)

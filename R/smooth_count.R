@@ -17,8 +17,8 @@
 #' is very small. Larger values for `prior_cases` produce
 #' more smoothing.
 #'
-#' @param count Number of people sampled who
-#' experience the outcome in question.
+#' @param count Number of people sampled who 
+#' experienced the outcome of interest.
 #' @param population Number of people sampled.
 #' @param prior_cases Variable used to control smoothing
 #' when the number of cases is small.
@@ -30,25 +30,28 @@
 #' census <- smoothscale::syn_census
 #'
 #' ## smooth all groups towards the national level
-#' smoothed <- smooth_counts(count = census$child_labour,
-#'                           population = census$all_children)
+#' smoothed <- smooth_count(count = census$child_labour,
+#'                          population = census$all_children)
 #'
 #' ## a tidyverse-style way of doing the same thing
 #' library(dplyr)
 #' census %>%
-#'   mutate(smoothed = smooth_counts(count = child_labour,
-#'                                   population = all_children))
+#'   mutate(smoothed = smooth_count(count = child_labour,
+#'                                  population = all_children))
 #'
 #' ## use tidyverse functions to smooth
 #' ## each age-sex group towards a
 #' ## different average
 #' census %>%
 #'   group_by(age, sex) %>%
-#'   mutate(smoothed = smooth_counts(count = child_labour,
-#'                                   population = all_children))
+#'   mutate(smoothed = smooth_count(count = child_labour,
+#'                                  population = all_children))
 #' @export
-smooth_counts <- function(count, population, prior_cases = 100) {
-    ## add tests of inputs
+smooth_count <- function(count, population, prior_cases = 100) {
+    check_count_population(count = count,
+                           population = population,
+                           na_ok = TRUE)
+    check_prior_cases(prior_cases)
     alpha_beta <- estimate_alpha_beta(count = count,
                                       population = population,
                                       prior_cases = prior_cases)

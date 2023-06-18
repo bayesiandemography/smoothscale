@@ -19,7 +19,7 @@
 #' @returns A named numeric vector of length 2.
 #'
 #' @seealso `estimate_alpha_beta()` is called
-#' by function [smooth_counts()].
+#' by function [smooth_count()].
 #'
 #' @examples
 #' estimate_alpha_beta(count = syn_census$child_labour,
@@ -28,9 +28,12 @@
 #' @keywords internal
 #' @export
 estimate_alpha_beta <- function(count, population, prior_cases) {
+    keep <- !is.na(count) & !is.na(population) & (population > 0)
+    count <- count[keep]
+    population <- population[keep]
     neg_log_post <- function(x) {
-        alpha <- x[[1L]]
-        beta <- x[[2L]]
+        alpha <- exp(x[[1L]])
+        beta <- exp(x[[2L]])
         n <- length(count)
         log_lik <- (sum(lbeta(count + alpha, population - count + beta))
             - n * lbeta(alpha, beta))
@@ -41,6 +44,10 @@ estimate_alpha_beta <- function(count, population, prior_cases) {
         -1 * (log_lik + log_prior)
     }
     val <- stats::optim(par = c(1, 1), fn = neg_log_post)
-    c(alpha = val$par[[1L]],
-      beta = val$par[[2L]])
+    convergence <- val$convergence
+    if (convergence != 0L)
+        cli::cli_abort(c("Optimiser did not converge.",
+                         i = "Convergence code: {convergence}."))
+    c(alpha = exp(val$par[[1L]]),
+      beta = exp(val$par[[2L]]))
 }

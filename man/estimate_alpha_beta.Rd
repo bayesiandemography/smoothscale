@@ -36,6 +36,6 @@ estimate_alpha_beta(count = syn_census$child_labour,
 }
 \seealso{
 `estimate_alpha_beta()` is called
-by function [smooth_counts()].
+by function [smooth_count()].
 }
 \keyword{internal}

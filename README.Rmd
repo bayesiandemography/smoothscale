@@ -34,7 +34,10 @@ devtools::install_github("bayesiandemography/smoothscale")
 library(smoothscale)
 library(dplyr, warn.conflicts = FALSE)
 syn_census %>%
-  mutate(child_labour_sm = smooth_counts(count = child_labour,
-                                         population = all_children))
+  mutate(child_labour_sm = smooth_count(count = child_labour,
+                                        population = all_children),
+         child_labour_sc = scale_count(count = child_labour,
+	                               population = all_children,
+				       total = 2000)
 ```
 

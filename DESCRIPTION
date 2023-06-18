@@ -8,6 +8,8 @@ Description: Functions for basic small area estimation that
     (i) smooth out sampling variation and (ii) scale local-level
     results to match national-level benchmarks.
 License: MIT + file LICENSE
+Depends:
+    R (>= 3.5.0)
 Imports:
     cli,
     stats,
@@ -18,8 +20,10 @@ Suggests:
     ggplot2,
     knitr,
     rmarkdown,
+    testthat (>= 3.0.0),
     tidyr
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.2.3
 VignetteBuilder: knitr
+Config/testthat/edition: 3
