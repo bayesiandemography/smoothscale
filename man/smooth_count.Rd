@@ -4,13 +4,13 @@
 \alias{smooth_count}
 \title{Smooth counts that are subject to sampling variation}
 \usage{
-smooth_count(count, population, prior_cases = 100)
+smooth_count(count, size, prior_cases = 100)
 }
 \arguments{
 \item{count}{Number of people sampled who 
 experienced the outcome of interest.}
 
-\item{population}{Number of people sampled.}
+\item{size}{Number of people sampled.}
 
 \item{prior_cases}{Variable used to control smoothing
 when the number of cases is small.}
@@ -41,13 +41,13 @@ census <- smoothscale::syn_census
 
 ## smooth all groups towards the national level
 smoothed <- smooth_count(count = census$child_labour,
-                         population = census$all_children)
+                         size = census$all_children)
 
 ## a tidyverse-style way of doing the same thing
 library(dplyr)
 census \%>\%
   mutate(smoothed = smooth_count(count = child_labour,
-                                 population = all_children))
+                                 size = all_children))
 
 ## use tidyverse functions to smooth
 ## each age-sex group towards a
@@ -55,5 +55,5 @@ census \%>\%
 census \%>\%
   group_by(age, sex) \%>\%
   mutate(smoothed = smooth_count(count = child_labour,
-                                 population = all_children))
+                                 size = all_children))
 }

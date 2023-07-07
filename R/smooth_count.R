@@ -1,5 +1,5 @@
 
-
+## HAS_TESTS
 #' Smooth counts that are subject to sampling variation
 #'
 #' Take a set of disaggregated counts drawn from
@@ -19,7 +19,7 @@
 #'
 #' @param count Number of people sampled who 
 #' experienced the outcome of interest.
-#' @param population Number of people sampled.
+#' @param size Number of people sampled.
 #' @param prior_cases Variable used to control smoothing
 #' when the number of cases is small.
 #'
@@ -31,13 +31,13 @@
 #'
 #' ## smooth all groups towards the national level
 #' smoothed <- smooth_count(count = census$child_labour,
-#'                          population = census$all_children)
+#'                          size = census$all_children)
 #'
 #' ## a tidyverse-style way of doing the same thing
 #' library(dplyr)
 #' census %>%
 #'   mutate(smoothed = smooth_count(count = child_labour,
-#'                                  population = all_children))
+#'                                  size = all_children))
 #'
 #' ## use tidyverse functions to smooth
 #' ## each age-sex group towards a
@@ -45,20 +45,20 @@
 #' census %>%
 #'   group_by(age, sex) %>%
 #'   mutate(smoothed = smooth_count(count = child_labour,
-#'                                  population = all_children))
+#'                                  size = all_children))
 #' @export
-smooth_count <- function(count, population, prior_cases = 100) {
-    check_count_population(count = count,
-                           population = population,
+smooth_count <- function(count, size, prior_cases = 100) {
+    check_count_size(count = count,
+                           size = size,
                            na_ok = TRUE)
     check_prior_cases(prior_cases)
     alpha_beta <- estimate_alpha_beta(count = count,
-                                      population = population,
+                                      size = size,
                                       prior_cases = prior_cases)
     alpha <- alpha_beta[["alpha"]]
     beta <- alpha_beta[["beta"]]
-    prevalence_smoothed <- (count + alpha) / (population + alpha + beta)
-    prevalence_smoothed * population
+    prevalence_smoothed <- (count + alpha) / (size + alpha + beta)
+    prevalence_smoothed * size
 }
 
 

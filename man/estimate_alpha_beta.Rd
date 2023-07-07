@@ -4,12 +4,12 @@
 \alias{estimate_alpha_beta}
 \title{Estimate parameters used in smoothing}
 \usage{
-estimate_alpha_beta(count, population, prior_cases)
+estimate_alpha_beta(count, size, prior_cases)
 }
 \arguments{
 \item{count}{A vector of non-negative values.}
 
-\item{population}{A vector of non-negative values}
+\item{size}{A vector of non-negative values}
 
 \item{prior_cases}{A non-negative scalar.}
 }
@@ -18,7 +18,7 @@ A named numeric vector of length 2.
 }
 \description{
 Estimate `alpha` and `beta` parameters from
-`count` and `population`, by maximising the
+`count` and `size`, by maximising the
 posterior density. This is an internal function,
 and would not normally be called directly
 by end users.
@@ -31,7 +31,7 @@ of alpha and beta.
 }
 \examples{
 estimate_alpha_beta(count = syn_census$child_labour,
-                    population = syn_census$all_children,
+                    size = syn_census$all_children,
                     prior_cases = 10)
 }
 \seealso{

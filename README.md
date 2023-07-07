@@ -4,6 +4,8 @@
 # smoothscale
 
 <!-- badges: start -->
+
+[![R-CMD-check](https://github.com/bayesiandemography/smoothscale/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/bayesiandemography/smoothscale/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 Simple small area estimation methods.
@@ -20,20 +22,29 @@ devtools::install_github("bayesiandemography/smoothscale")
 library(smoothscale)
 library(dplyr, warn.conflicts = FALSE)
 syn_census %>%
-  mutate(child_labour_sm = smooth_counts(count = child_labour,
-                                         population = all_children))
-#> # A tibble: 80 × 6
-#>    area    age   sex    child_labour all_children child_labour_sm
-#>    <chr>   <chr> <chr>         <int>        <dbl>           <dbl>
-#>  1 Area 01 5-9   Female            3            6           2.41 
-#>  2 Area 01 5-9   Male              0            5           0.759
-#>  3 Area 01 10-14 Female            0            5           0.759
-#>  4 Area 01 10-14 Male              0            3           0.564
-#>  5 Area 02 5-9   Female            1            3           0.922
-#>  6 Area 02 5-9   Male             10           36          10.1  
-#>  7 Area 02 10-14 Female            1            3           0.922
-#>  8 Area 02 10-14 Male              0            6           0.831
-#>  9 Area 03 5-9   Female            4           22           4.48 
-#> 10 Area 03 5-9   Male              0            5           0.759
-#> # ℹ 70 more rows
+  inner_join(syn_survey, by = c("age", "sex")) %>%
+  group_by(age, sex) %>%
+  mutate(child_labour_sm = smooth_count(count = child_labour,
+                                        size = all_children),
+         child_labour_sc = scale_count(count = child_labour,
+                                         size = all_children,
+                                       count_total = total_child_labour,
+                                       size_total = total_all_children))
+#> # A tibble: 200 × 9
+#> # Groups:   age, sex [4]
+#>    area    age   sex    child_labour all_children total_child_labour
+#>    <chr>   <chr> <chr>         <int>        <dbl>              <dbl>
+#>  1 Area 01 5-9   Female           42          368             222365
+#>  2 Area 02 5-9   Female           10           33             222365
+#>  3 Area 03 5-9   Female          112          453             222365
+#>  4 Area 04 5-9   Female          151          354             222365
+#>  5 Area 05 5-9   Female           23          101             222365
+#>  6 Area 06 5-9   Female            3            5             222365
+#>  7 Area 07 5-9   Female            3           14             222365
+#>  8 Area 08 5-9   Female            6           35             222365
+#>  9 Area 09 5-9   Female           14           48             222365
+#> 10 Area 10 5-9   Female          422         1889             222365
+#> # ℹ 190 more rows
+#> # ℹ 3 more variables: total_all_children <dbl>, child_labour_sm <dbl>,
+#> #   child_labour_sc <dbl>
 ```

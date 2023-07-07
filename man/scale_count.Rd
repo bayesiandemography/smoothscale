@@ -4,15 +4,18 @@
 \alias{scale_count}
 \title{Scale counts to match totals}
 \usage{
-scale_count(count, population, total)
+scale_count(count, size, count_total, size_total)
 }
 \arguments{
 \item{count}{Number of people sampled who 
 experienced the outcome of interest.}
 
-\item{population}{Number of people sampled.}
+\item{size}{Number of people sampled.}
 
-\item{total}{Target number that `count`
+\item{count_total}{Target number that `count`
+should add up to.}
+
+\item{size_total}{Target number that `size`
 should add up to.}
 }
 \value{
@@ -24,36 +27,35 @@ pre-specified totals, such as totals
 obtained from a national survey.
 }
 \examples{
-## use synthetic census data
+## use synthetic census and survey data
 census <- smoothscale::syn_census
+survey <- smoothscale::syn_survey
 
 ## adjust all groups to match combined total
-national_total <- 1450
+national_child_labour <- 1104194
+national_all_children <- 3035800
 child_labour_sc <- scale_count(count = census$child_labour,
-                               population = census$all_children,
-                               total = national_total)
+                               size = census$all_children,
+                               count_total = national_child_labour,
+                               size_total = national_all_children)
 
 ## a tidyverse-style way of doing the same thing
 library(dplyr)
 census \%>\%
   mutate(child_labour_sc = scale_count(count = child_labour,
-                                       population = all_children,
-                                       total = national_total))
+                                       size = all_children,
+                                       count_total = national_child_labour,
+                                       size_total = national_all_children))
 
 ## use tidyverse functions to adjust each
 ## age-sex group to a different total
-national_total <- tribble(
-  ~age,  ~sex,     ~national_total,
-  "5-9", "Female", 200,
-  "5-9", "Male",   260,
-"10-14", "Female", 600,
-"10-14", "Male",   420)
 scaled <- census \%>\%
-  left_join(national_total, by = c("age", "sex")) \%>\%
+  left_join(survey, by = c("age", "sex")) \%>\%
   group_by(age, sex) \%>\%
   mutate(child_labour_sc = scale_count(count = child_labour,
-                                       population = all_children,
-                                       total = national_total))
+                                       size = all_children,
+                                       count_total = national_child_labour,
+                                       size_total = national_all_children))
 scaled
 scaled \%>\%
   count(age, sex, wt = child_labour_sc)

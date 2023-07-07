@@ -2,7 +2,7 @@
 #' Estimate parameters used in smoothing
 #'
 #' Estimate `alpha` and `beta` parameters from
-#' `count` and `population`, by maximising the
+#' `count` and `size`, by maximising the
 #' posterior density. This is an internal function,
 #' and would not normally be called directly
 #' by end users.
@@ -13,7 +13,7 @@
 #' of alpha and beta.
 #'
 #' @param count A vector of non-negative values.
-#' @param population A vector of non-negative values
+#' @param size A vector of non-negative values
 #' @param prior_cases A non-negative scalar.
 #'
 #' @returns A named numeric vector of length 2.
@@ -23,19 +23,19 @@
 #'
 #' @examples
 #' estimate_alpha_beta(count = syn_census$child_labour,
-#'                     population = syn_census$all_children,
+#'                     size = syn_census$all_children,
 #'                     prior_cases = 10)
 #' @keywords internal
 #' @export
-estimate_alpha_beta <- function(count, population, prior_cases) {
-    keep <- !is.na(count) & !is.na(population) & (population > 0)
+estimate_alpha_beta <- function(count, size, prior_cases) {
+    keep <- !is.na(count) & !is.na(size) & (size > 0)
     count <- count[keep]
-    population <- population[keep]
+    size <- size[keep]
     neg_log_post <- function(x) {
         alpha <- exp(x[[1L]])
         beta <- exp(x[[2L]])
         n <- length(count)
-        log_lik <- (sum(lbeta(count + alpha, population - count + beta))
+        log_lik <- (sum(lbeta(count + alpha, size - count + beta))
             - n * lbeta(alpha, beta))
         log_prior <- stats::dlnorm(alpha + beta,
                                    meanlog = log(prior_cases),

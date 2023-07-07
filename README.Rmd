@@ -16,6 +16,7 @@ knitr::opts_chunk$set(
 # smoothscale
 
 <!-- badges: start -->
+[![R-CMD-check](https://github.com/bayesiandemography/smoothscale/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/bayesiandemography/smoothscale/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 Simple small area estimation methods.
@@ -34,10 +35,13 @@ devtools::install_github("bayesiandemography/smoothscale")
 library(smoothscale)
 library(dplyr, warn.conflicts = FALSE)
 syn_census %>%
+  inner_join(syn_survey, by = c("age", "sex")) %>%
+  group_by(age, sex) %>%
   mutate(child_labour_sm = smooth_count(count = child_labour,
-                                        population = all_children),
+                                        size = all_children),
          child_labour_sc = scale_count(count = child_labour,
-	                               population = all_children,
-				       total = 2000)
+	                                     size = all_children,
+                                       count_total = total_child_labour,
+                                       size_total = total_all_children))
 ```
 

@@ -14,35 +14,56 @@ knitr::opts_chunk$set(
 )
 ```
 
+Package **smoothscale** contains two functions for doing simple small area estimation with data that has sampling errors and/or measurement errors. This vignette demonstrates the use of the two functions, using some synthetic data.
+
+First we load the package.
+
 ```{r setup}
 library(smoothscale)
 ```
 
+We will be using the dataset `syn_census`.
+
 ```{r}
 syn_census
 ```
+The dataset contains synthetic (i.e. fake) data, but the data has a similar structure to real census data. For each combination of area, age, and sex, the dataset has counts of children involved in child labour, and counts of all children.
 
+The function `smooth_count()` has two main arguments:
+
+- `count` is the count variable that needs to be smoothed, in our case, counts of child labour
+- `size` is the number of respondents from which counts were draw, in our case, counts of all children in the census file.
+
+The function produces a smoothed version of the `count` variable.
 
 ```{r}
-smooth_count(count = syn_census$child_labour,
-              population = syn_census$all_children)
+smoothed <- smooth_count(count = syn_census$child_labour,
+                         size = syn_census$all_children)
+head(smoothed)
 ```
+
+Function `smooth_count()` pulls prevalences (ie counts divided by size) towards the overall average. We know, however, that child labour is likely to vary by age and sex. It would be better to smooth each combination of age and sex towards their own average. 
+
+A convenient way to smooth within combinations of other variables is to use functions contained in the [dplyr](https://dplyr.tidyverse.org) package (part of the[tidyverse](https://www.tidyverse.org).)
 
 ```{r}
 library(dplyr)
-library(tidyr)
-library(forcats)
-census <- syn_census %>%
-  mutate(child_labour_sm = smooth_count(count = child_labour,
-                                         population = all_children))
-census
+smoothed_agesex <- syn_census %>%
+  group_by(age, sex) %>%
+  mutate(child_labour_smoothed = smooth_count(count = child_labour,
+                                              size = all_children)) %>%
+  ungroup()
+smoothed_agesex
 ```
 
-```{r, fig.width = 7, fig.height = 7}
-library(ggplot2)
+We calculate and plot prevalences, using some more tidyverse packages and functions,
+
+```{r, fig.height = 7, fig.width = 7}
 library(tidyr)
-data_for_plot <- census %>%
-  pivot_longer(col = c(child_labour, child_labour_sm),
+library(forcats)
+library(ggplot2)
+data_for_plot <- smoothed_agesex %>%
+  pivot_longer(col = c(child_labour, child_labour_smoothed),
                names_to = "measure") %>%
   mutate(prevalence = value / all_children) %>%
   mutate(area = fct_reorder(area, prevalence))
@@ -54,27 +75,4 @@ ggplot(data_for_plot,
 
 
 
-```{r}
-census2 <- syn_census %>%
-  group_by(age, sex) %>%
-  mutate(child_labour_sm = smooth_count(count = child_labour,
-                                         population = all_children))
-census2
-```
 
-
-
-```{r}
-library(ggplot2)
-library(tidyr)
-library(forcats)
-data_for_plot2 <- census2 %>%
-  pivot_longer(col = c(child_labour, child_labour_sm),
-               names_to = "measure") %>%
-  mutate(prevalence = value / all_children) %>%
-  mutate(area = reorder(area, prevalence))
-ggplot(data_for_plot,
-       aes(x = prevalence, y = area, color = measure)) +
-  facet_grid(vars(age), vars(sex)) +
-  geom_point()
-```

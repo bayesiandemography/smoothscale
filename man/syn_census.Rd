@@ -20,7 +20,8 @@ syn_census
 }
 \description{
 A synthetic (ie made-up) dataset, illustrating the
-sort of data that a census or survey. The synthetic data
-measure child labour.
+sort of tabulations than can be produced from a census file.
+The synthetic data measure child labour at the
+area level.
 }
 \keyword{datasets}
