@@ -38,7 +38,7 @@ syn_census %>%
   inner_join(syn_survey, by = c("age", "sex")) %>%
   group_by(age, sex) %>%
   mutate(child_labour_sm = smooth_count(count = child_labour,
-                                        size = all_children),
+                                      size = all_children),
          child_labour_sc = scale_count(count = child_labour,
 	                                     size = all_children,
                                        count_total = total_child_labour,
