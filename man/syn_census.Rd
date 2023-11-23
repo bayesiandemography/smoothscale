@@ -5,15 +5,16 @@
 \alias{syn_census}
 \title{A synthetic census dataset}
 \format{
-A [tibble][tibble::tibble()] with 80 rows and the following columns:
-
-- `area`: Geographical area, numbered from 1 to 20
-- `age`: `"5-9" or `"10-14"`
-- `sex`: `"Female"` or `"Male"`
-- `child_labour`: Number of children involved in
-  child labour
-- `all_children`: Total number of children, including
-  those not involved in child labour
+A \link[tibble:tibble]{tibble} with 80 rows and the following columns:
+\itemize{
+\item \code{area}: Geographical area, numbered from 1 to 20
+\item \code{age}: \verb{"5-9" or }"10-14"`
+\item \code{sex}: \code{"Female"} or \code{"Male"}
+\item \code{child_labour}: Number of children involved in
+child labour
+\item \code{all_children}: Total number of children, including
+those not involved in child labour
+}
 }
 \usage{
 syn_census

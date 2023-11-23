@@ -17,15 +17,15 @@ estimate_alpha_beta(count, size, prior_cases)
 A named numeric vector of length 2.
 }
 \description{
-Estimate `alpha` and `beta` parameters from
-`count` and `size`, by maximising the
+Estimate \code{alpha} and \code{beta} parameters from
+\code{count} and \code{size}, by maximising the
 posterior density. This is an internal function,
 and would not normally be called directly
 by end users.
 }
 \details{
 The posterior density is formed by multiplying
-a [beta-binomial](https://en.wikipedia.org/wiki/Beta-binomial_distribution)
+a \href{https://en.wikipedia.org/wiki/Beta-binomial_distribution}{beta-binomial}
 likelihood by a log-normal prior on the sum
 of alpha and beta.
 }
@@ -35,7 +35,7 @@ estimate_alpha_beta(count = syn_census$child_labour,
                     prior_cases = 10)
 }
 \seealso{
-`estimate_alpha_beta()` is called
-by function [smooth_count()].
+\code{estimate_alpha_beta()} is called
+by function \code{\link[=smooth_count]{smooth_count()}}.
 }
 \keyword{internal}

@@ -1,8 +1,21 @@
 
 ## HAS_TESTS
-#' Smooth counts that are subject to sampling variation
+#' Smooth Counts in Proportion to Sample Size
 #'
-#' Take a set of disaggregated counts drawn from
+#' @description
+#' 
+#' Given a set of counts drawn from populations,
+#' smooth the counts. The smoothing 
+#'
+#' - pulls ratios towards the overall average, and
+#' - affects small counts more than large counts.
+#'
+#' @details
+#'
+#' An example is
+#'
+#' Take a set of disaggregated counts and smooth them
+#' towards smooth drawn from
 #' disaggregated populations,
 #' and smooth towards an overall average,
 #' with small counts being smoothed more than large counts.

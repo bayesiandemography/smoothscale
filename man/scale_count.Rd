@@ -7,15 +7,15 @@
 scale_count(count, size, count_total, size_total)
 }
 \arguments{
-\item{count}{Number of people sampled who 
+\item{count}{Number of people sampled who
 experienced the outcome of interest.}
 
 \item{size}{Number of people sampled.}
 
-\item{count_total}{Target number that `count`
+\item{count_total}{Target number that \code{count}
 should add up to.}
 
-\item{size_total}{Target number that `size`
+\item{size_total}{Target number that \code{size}
 should add up to.}
 }
 \value{
@@ -61,5 +61,5 @@ scaled \%>\%
   count(age, sex, wt = child_labour_sc)
 }
 \seealso{
-[smooth_count()]
+\code{\link[=smooth_count]{smooth_count()}}
 }

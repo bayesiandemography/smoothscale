@@ -7,7 +7,7 @@
 smooth_count(count, size, prior_cases = 100)
 }
 \arguments{
-\item{count}{Number of people sampled who 
+\item{count}{Number of people sampled who
 experienced the outcome of interest.}
 
 \item{size}{Number of people sampled.}
@@ -27,12 +27,12 @@ with small counts being smoothed more than large counts.
 \details{
 The easiest way to smooth sub-populations towards
 separate averages is to use
-[grouped](https://dplyr.tidyverse.org/reference/group_data.html)
+\href{https://dplyr.tidyverse.org/reference/group_data.html}{grouped}
 data frames. See the example below.
 
-The `prior_cases` argument controls the amount of smoothing.
+The \code{prior_cases} argument controls the amount of smoothing.
 Its effect is only noticeable when the number of cases
-is very small. Larger values for `prior_cases` produce
+is very small. Larger values for \code{prior_cases} produce
 more smoothing.
 }
 \examples{

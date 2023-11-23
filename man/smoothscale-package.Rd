@@ -6,16 +6,18 @@
 \alias{smoothscale-package}
 \title{Package 'smoothscale'}
 \description{
-**smoothscale** contains two functions for
+\strong{smoothscale} contains two functions for
 simple small area estimation:
-- [smooth_count()] deals with sampling error in counts
-  by pulling them towards an overall average
-- [scale_count()] deals with measurement error in counts
-  by scaling them to be consistent with a (reliable)
-  overall total
+\itemize{
+\item \code{\link[=smooth_count]{smooth_count()}} deals with sampling error in counts
+by pulling them towards an overall average
+\item \code{\link[=scale_count]{scale_count()}} deals with measurement error in counts
+by scaling them to be consistent with a (reliable)
+overall total
+}
 }
 \details{
-**smoothscale** also contains a synthetic dataset
-called [syn_census].
+\strong{smoothscale} also contains a synthetic dataset
+called \link{syn_census}.
 }
 \keyword{internal}

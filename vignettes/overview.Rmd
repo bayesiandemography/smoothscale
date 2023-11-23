@@ -75,4 +75,65 @@ ggplot(data_for_plot,
 
 
 
+# Math
+
+## The setting
+
+In each of $K$ small areas, $n_k$ people are asked a yes-no question, such as whether they are employed. The number of people who answer yes in each area is $x_k$. We are interested in (1) the true number of people in each area with the attribute or behavior of interest, and (2) the underlying probability that a person in each area has the attribute or behavior of interest. For instance, we might be interested in (1) the true number of people who are employed in each small area, and (2) the probability of being employed in each small area.
+
+There are multiple reasons why $x_k$, the reported number of people with the attribute or behavior in area $k$, might differ from the true number. One reason is incomplete coverage. The number of people who were asked the question, $n_k$, might be less than the true number of people, because the data were collected through a survey, or through a census with less with response rates that were lower than 100%. Everyone who is missing from $n_k$ will also be missing from $x_k$. Another reason for inaccuracies in $x_k$ is measurement error. Some respondents may give incorrect responses, because they do not understand the question or because the information being requested is sensitive. In addition, the attribute or behavior that is asked about in the survey might not completely align with the attribute or behavior that we want to study. For instance, the survey or census might use a different definition of employment from the one that we prefer.
+
+A further complication is that, even when we have accurate data and complete coverage, if counts are small, we may still have difficulty inferring true underlying probabilities. Consider, for instance, two areas, each of which only has two people. In the first area, one person is employed, and in the second area, no one is employed. We might guess that the probability of being employed is greater in the first area than in the second. A person's employment status is, however, affected by many idiosyncratic factors, such as the person's employment history or health status. In a large population, these idiosyncratic factors average out, and can be ignored when assessing overall probabilities. In a small population, much less averaging occurs, and the observed proportion of people who are employed has a strong random component. To obtain sensible estimates of underlying probabilities or propensities in small populations, we need to somehow allow for randomness.
+
+## Our general approach
+
+
+
+
+## Smoothing
+
+\begin{equation}
+  x_k \sim \text{Binomial}(n_k, \pi_k)
+\end{equation}
+
+\begin{equation}
+  \pi_k \sim \text{Beta}(\alpha, \beta)
+\end{equation}
+
+\begin{equation}
+  \alpha + \beta \sim \text{LogNormal}(\log(M), S^2)
+\end{equation}
+
+
+\begin{equation}
+  \hat{x}_k = \hat{\pi}_k n_k
+\end{equation}
+
+
+## Scaling
+
+\begin{equation}
+  y_k = x_k + \rho (n_k - x_k)
+\end{equation}
+
+know $Y = \sum_{k=1}^K y_k$. Define 
+
+Derive value for $\rho$,
+
+\begin{equation}
+  \hat{\rho} = \frac{Y - \sum_{k=1}^K x_k}{\sum_{k=1}^K n_k - \sum_{k=1}^K x_k}
+\end{equation}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
