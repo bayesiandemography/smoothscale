@@ -1,39 +1,39 @@
 
-## 'check_count_size' ---------------------------------------------------
+## 'check_x_size' ---------------------------------------------------
 
-test_that("'check_count_size' returns TRUE with valid inputs", {
-    expect_true(check_count_size(count = 1:6, size = 2:7, na_ok = FALSE))
-    expect_true(check_count_size(count = c(1:6, NA), size = c(2:7, NA), na_ok = TRUE))
+test_that("'check_x_size' returns TRUE with valid inputs", {
+    expect_true(check_x_size(x = 1:6, size = 2:7, na_ok = FALSE))
+    expect_true(check_x_size(x = c(1:6, NA), size = c(2:7, NA), na_ok = TRUE))
 })
 
-test_that("'check_count_size' raises correct error with non-numeric", {
-    expect_error(check_count_size(count = 1:6, size = c("a", 3:7), na_ok = FALSE),
+test_that("'check_x_size' raises correct error with non-numeric", {
+    expect_error(check_x_size(x = 1:6, size = c("a", 3:7), na_ok = FALSE),
                  "`size` is not numeric.")
 })
 
-test_that("'check_count_size' raises correct error with infinite", {
-    expect_error(check_count_size(count = 1:6, size = c(Inf, 3:7), na_ok = FALSE),
+test_that("'check_x_size' raises correct error with infinite", {
+    expect_error(check_x_size(x = 1:6, size = c(Inf, 3:7), na_ok = FALSE),
                  "`size` has infinite value.")
 })
 
-test_that("'check_count_size' raises correct error with negative", {
-    expect_error(check_count_size(count = c(-1, 2:6), size = 2:7, na_ok = FALSE),
-                 "`count` has negative value.")
+test_that("'check_x_size' raises correct error with negative", {
+    expect_error(check_x_size(x = c(-1, 2:6), size = 2:7, na_ok = FALSE),
+                 "`x` has negative value.")
 })
 
-test_that("'check_count_size' raises correct error with NA", {
-    expect_error(check_count_size(count = c(NA, 2:6), size = 2:7, na_ok = FALSE),
-                 "`count` has NA.")
+test_that("'check_x_size' raises correct error with NA", {
+    expect_error(check_x_size(x = c(NA, 2:6), size = 2:7, na_ok = FALSE),
+                 "`x` has NA.")
 })
 
-test_that("'check_count_size' raises correct error with different lengths", {
-    expect_error(check_count_size(count = 2:6, size = 2:7, na_ok = FALSE),
-                 "`count` and `size` have different lengths.")
+test_that("'check_x_size' raises correct error with different lengths", {
+    expect_error(check_x_size(x = 2:6, size = 2:7, na_ok = FALSE),
+                 "`x` and `size` have different lengths.")
 })
 
-test_that("'check_count_size' raises correct error with count > popn", {
-    expect_error(check_count_size(count = c(2:6, 8), size = 2:7, na_ok = FALSE),
-                 "`count` greater than `size`.")
+test_that("'check_x_size' raises correct error with x > popn", {
+    expect_error(check_x_size(x = c(2:6, 8), size = 2:7, na_ok = FALSE),
+                 "`x` greater than `size`.")
 })
 
 

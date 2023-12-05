@@ -1,21 +1,22 @@
 
-#' Scale counts to match totals
+#' Scale Probabilities
 #'
-#' Scale counts so that they add up to
-#' pre-specified totals, such as totals
-#' obtained from a national survey.
+#' Scale probabilities so that they are
+#' consistent with pre-specified benchmarks,
+#' such as totals obtained from a national survey.
 #'
-#' @param count Number of people sampled who 
-#' experienced the outcome of interest.
-#' @param size Number of people sampled.
-#' @param count_total Target number that `count`
-#' should add up to.
-#' @param size_total Target number that `size`
-#' should add up to.
+#' @param x Number of successes in each group.
+#' A numeric vector.
+#' @param size Number of trials in each group.
+#' A numeric vector.
+#' @param prob_target Probability that
+#' Benchmark probability.
+#' A number between 0 and 1.
 #'
-#' @returns A numeric vector with scaled counts.
+#' @returns A numeric vector with scaled
+#' probabilities.
 #'
-#' @seealso [smooth_count()]
+#' @seealso [smooth_prob()]
 #'
 #' @examples
 #' ## use synthetic census and survey data

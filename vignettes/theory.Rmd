@@ -1,0 +1,190 @@
+---
+title: "Statistical Models used for Smoothing and Scaling"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Statistical Models used for Smoothing and Scaling}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+bibliography: references.bib
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Introduction
+
+The **smoothscale** package provides functions for estimating counts and prevalences in multiple small populations. Typical applications would be estimating the number of people below the poverty line in multiple villages, or estimating the prevalence of child labour in multiple districts.
+
+Methods for constructing estimates for multiple small populations are referred to by statisticians as "small area estimation" [@rao2015small,@eclac2022child]. Many of these methods are complex, and require specialist statistical skills to implement and interpret. The methods in **smoothscale** are deliberately simple.
+
+Estimating counts and prevalences for small populations can be challenging. The challenges can often be traced back to two sorts of errors:
+
+1. sampling errors,
+2. measurement errors.
+
+The **smoothscale** package provides functions for each of these types of errors. This vignette describes each of these errors, and the associated **smoothscale** functions. It then discusses two complications that often arise in practice: the need to stratify by additional variables such as age and sex/gender, and the needs to analyse data that has both sampling errors and measurement errors.
+
+# Sampling Errors
+
+We would like to estimate the prevalence of some attribute, such as employment or school attendance, in each of $k = 1, \cdots, K$ small areas. We have data on $n_k$ people from each area. A subset $x_k$ of people in each area have the attribute in question. Data on school attendance, for instance, might look like this:
+
+| District | Respondents  | Respondents attending school |
+|:---------|:------------:|:----------------------------:|
+|     1001 |           83 |                           62 |
+|     1002 |           25 |                           18 |
+| $\vdots$ |     $\vdots$ |                     $\vdots$ |
+|     1156 |           54 |                           41 |
+
+
+If the data come from a census or administrative system, then the number of repondents may be a good approximation of the size of the target population in each area. The number of children captured in the census, for instance, should be close to the actual number of children living in an area.
+
+If, however, the data come from a survey, then the number of respondents is likely to be much lower than the number of people in the target population. In this case, to estimate counts of people with the attribute in each area, we need an additional set of data, $N_k$, $k = 1, \cdots, K$, on the size of the target population in each area.  Data on a target population of school-age children, for instance, might look like this:
+
+| District | Total school-age children  |
+|:---------|:--------------------------:|
+|     1001 |                       4027 |
+|     1002 |                       1382 |
+| $\vdots$ |                   $\vdots$ |  
+|     1156 |                       2994 |
+
+
+
+## Statistical challenges
+
+- why not just use $x$ or $x/n$?
+- types of sampling error
+    - incomplete sample
+    - super-population
+
+When counts are small, it can be difficult to estimate underlying probabilities. Consider, for instance, the problem of trying to estimate the probability of being employed in a population consisting of 5 people, 2 of whom are currently employed. The observed proportion of people who are currently employed is 2/5 = 0.4. In the absence of any other information, it is reasonable to conclude that the underlying probability of being employed is also 0.4. But it is hard to have much confidence in this conclusion. Employment is governed by random, idiosyncratic factors, and, in a population of only 5 people, it would be easy for the number of employed people to jump around, without any change in the underlying probability of being employed.
+
+Consider, instead, a population where there are 5000 people, of whom 2000 are currently employed. We would be much more confident in saying that the probability of being employed in this population is somewhere near 0.4. In large populations, there is much more scope for random, idiosyncratic factors to cancel out, so that the observed proportion stays close to the underlying probability.
+
+Small counts are a problem for estimating underlying probabilities even when data include everyone from the population of interest. If a dataset only has information on 5 cases, it does not matter whether (1) the cases were randomly selected from a much larger population, or (2) the population in fact only has 5 people. In both cases, the challenge is to strip out the effects of random variation, and get at underlying propensities.
+
+
+
+## Model
+
+Function `smooth_prob()` treats the number of people in area $k$ with attribute of interest, denoted $x_k$, as a random draw from a binomial distribution,
+\begin{equation}
+  x_k \sim \text{Binomial}(n_k, \pi_k),
+\end{equation}
+where $n_k$ is the total number of people (with or without the attribute), and $\pi_k$ is the probability of having the attribute.
+
+The probabilities $\pi_k$ are treated as coming from a beta distribution,
+\begin{equation}
+  \pi_k \sim \text{Beta}(\alpha, \beta).
+\end{equation}
+In doing so, `smooth_prob()` is assuming that probabilities across the different areas are similar, but not identical.
+
+The degree to which they are similar, and the mean across the different areas, depends on parameters $\alpha$ and $\beta$. These parameters are estimated within the model.
+
+Parameters $\alpha$ and $\beta$ are transformed into $\lambda$ and $\nu$,
+\begin{align}
+  \alpha & = \lambda \nu \\
+  \beta & = (1 - \lambda) \nu
+\end{align}
+with $0 < \lambda < 1$ and $\nu > 0$. The expected value for $\pi_k$ equals $\lambda$, and the amount of variability in $\pi$ is governmed by $\nu$. The $\lambda$ and $\nu$ parameters are both given weak priors,
+\begin{align}
+  \lambda & \sim \text{Unif}(0, 1) \\
+  \nu & \sim \text{Cauchy}^+(0, M).
+\end{align}
+
+
+\begin{equation}
+  \hat{x}_k = \hat{\pi}_k n_k
+\end{equation}
+
+
+
+
+[present model]
+[show estimator]
+[inference]
+
+## Partial pooling
+
+
+# Measurement error
+
+## Goal
+
+The area-level tabulations may also be affected by measurement error. For instance, some respondents may have misinterpreted the questions, or the questions may used different definitions from the ones that we need. 
+
+
+- as above
+
+## Data
+
+As above, plus national-level
+
+In some cases, reliable national-level data on prevalences might also be available. There might, for instance, be reliable national-level estimate of the proportion of children attending school. A common source of reliable national-level data is household surveys. Household surveys typically do not have large enough samples to provide stable estimates for small areas. However, they typically do have large enough samples to provide stable estimates at the national level, while also having relatively low measurement errors.
+
+The reliable national-level prevalences may be disaggregated by subpopulation. For instance, national-level school attendance data might look like this:
+
+|   Age | Sex    | Percent of children attending school |
+|-------|--------|:------------------------------------:|
+|   5-9 | Female |                                   92 |
+|   5-9 | Male   |                                   91 |
+| 10-14 | Female |                                   84 |
+| 10-14 | Male   |                                   82 |
+
+
+
+
+## Statistical challenges
+
+- No sampling model
+- Have idea of average size of adjustment, but not particular
+
+## Model
+
+Let $\pi_k^*$ denote a scaled version of $\pi_k$. We know the national total
+\begin{equation}
+  \bar{\pi}^* = \sum_{k=1}^K w_k \pi_k^*
+\end{equation}
+and would to derive the individual $\pi_k$. 
+
+Assume
+\begin{equation}
+  \pi_k^* =
+    \begin{cases}
+      \pi_k + \rho (1 - \pi_k) & \text{ if} \pi_k < \bar{\pi}^* \\
+      \pi_k - \rho \pi_k & \text{ otherwise}.
+    \end{cases}
+\end{equation}
+
+\begin{equation}
+  \bar{\pi}^* = \sum_{k=1}^K w_k (\pi_k + \rho (1 - \pi_k)) = \bar{\pi} + \rho (1 - \bar{\pi})
+\end{equation}
+
+\begin{equation}
+  \rho = \frac{\bar{\pi}^* - \bar{\pi}}{1 - \bar{\pi}}
+\end{equation}
+
+
+
+# Stratification
+
+Often the data is also disaggregated by subpopulation. For instance, data disaggregated by age and sex might look like this:
+
+| District |      Age | Sex      | All Children | Children attending school |
+|----------|----------|----------|:------------:|:-------------------------:|
+|     1001 |      5-9 | Female   |           14 |                        10 |
+|     1001 |      5-9 | Male     |           16 |                        13 |
+|     1001 |    10-14 | Female   |           28 |                        21 |
+|     1001 |    10-14 | Male     |           25 |                        18 |
+| $\vdots$ | $\vdots$ | $\vdots$ |     $\vdots$ |                  $\vdots$ |
+|     1156 |      5-9 | Female   |           11 |                        15 |
+|     1156 |      5-9 | Male     |           13 |                        13 |
+|     1156 |    10-14 | Female   |           17 |                         5 |
+|     1156 |    10-14 | Male     |           13 |                         8 |
+
+
+# Combining
+

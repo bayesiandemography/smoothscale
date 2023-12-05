@@ -2,12 +2,12 @@
 % Please edit documentation in R/estimate_alpha_beta.R
 \name{estimate_alpha_beta}
 \alias{estimate_alpha_beta}
-\title{Estimate parameters used in smoothing}
+\title{Estimate Parameters Used in Smoothing}
 \usage{
-estimate_alpha_beta(count, size, prior_cases)
+estimate_alpha_beta(x, size, prior_cases)
 }
 \arguments{
-\item{count}{A vector of non-negative values.}
+\item{x}{A vector of non-negative values.}
 
 \item{size}{A vector of non-negative values}
 
@@ -18,7 +18,7 @@ A named numeric vector of length 2.
 }
 \description{
 Estimate \code{alpha} and \code{beta} parameters from
-\code{count} and \code{size}, by maximising the
+\code{x} and \code{size}, by maximising the
 posterior density. This is an internal function,
 and would not normally be called directly
 by end users.
@@ -26,16 +26,16 @@ by end users.
 \details{
 The posterior density is formed by multiplying
 a \href{https://en.wikipedia.org/wiki/Beta-binomial_distribution}{beta-binomial}
-likelihood by a log-normal prior on the sum
+likelihood by a half-Cauchy prior on the sum
 of alpha and beta.
 }
 \examples{
-estimate_alpha_beta(count = syn_census$child_labour,
+estimate_alpha_beta(x = syn_census$child_labour,
                     size = syn_census$all_children,
-                    prior_cases = 10)
+                    prior_cases = 100)
 }
 \seealso{
 \code{estimate_alpha_beta()} is called
-by function \code{\link[=smooth_count]{smooth_count()}}.
+by function \code{\link[=smooth_prob]{smooth_prob()}}.
 }
 \keyword{internal}

@@ -2,5 +2,5 @@
 
 export(estimate_alpha_beta)
 export(scale_count)
-export(smooth_count)
+export(smooth_prob)
 importFrom(tibble,tibble)

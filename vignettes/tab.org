@@ -1,0 +1,11 @@
+|   Age | Sex    | Percent of children attending school |
+|-------+--------+--------------------------------------|
+|   5-9 | Female |                                   92 |
+|   5-9 | Male   |                                   91 |
+| 10-14 | Female |                                   84 |
+| 10-14 | Male   |                                   82 |
+
+
+
+
+

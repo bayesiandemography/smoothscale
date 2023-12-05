@@ -1,21 +1,21 @@
 
 ## HAS_TESTS
-#' Check 'count' and 'size' arguments
+#' Check 'x' and 'size' arguments
 #'
-#' Check that 'count' and 'size' both
+#' Check that 'x' and 'size' both
 #' is finite, non-negative numeric, and have
 #' same length. If 'na_ok' is FALSE, check
 #' that neither have NAs.
 #'
-#' @param count A numeric vector
+#' @param x A numeric vector
 #' @param size A numeric vector
 #' @param na_ok Logical flag
 #'
 #' @returns TRUE, invisibly
 #'
 #' @noRd
-check_count_size <- function(count, size, na_ok) {
-    for (nm in c("count", "size")) {
+check_x_size <- function(x, size, na_ok) {
+    for (nm in c("x", "size")) {
         value <- get(nm)
         if (!is.numeric(value))
             cli::cli_abort(c("{.arg {nm}} is not numeric.",
@@ -28,15 +28,15 @@ check_count_size <- function(count, size, na_ok) {
             if (anyNA(value))
                 cli::cli_abort("{.arg {nm}} has NA.")
     }
-    if (length(count) != length(size)) 
-        cli::cli_abort(c("{.arg count} and {.arg size} have different lengths.",
-                         i = "{.arg count} has length {length(count)}.",
+    if (length(x) != length(size)) 
+        cli::cli_abort(c("{.arg x} and {.arg size} have different lengths.",
+                         i = "{.arg x} has length {length(x)}.",
                          i = "{.arg size} has length {length(size)}."))
-    is_gt <- !is.na(count) & !is.na(size) & (count > size)
+    is_gt <- !is.na(x) & !is.na(size) & (x > size)
     i_gt <- match(TRUE, is_gt, nomatch = 0L)
     if (i_gt > 0L) {
-        cli::cli_abort(c("{.arg count} greater than {.arg size}",
-                         i = "Element {i_gt} of {.arg count} is {count[[i_gt]]}.",
+        cli::cli_abort(c("{.arg x} greater than {.arg size}",
+                         i = "Element {i_gt} of {.arg x} is {x[[i_gt]]}.",
                          i = "Element {i_gt} of {.arg size} is {size[[i_gt]]}."))
     }
     invisible(TRUE)
