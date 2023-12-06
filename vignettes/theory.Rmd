@@ -17,20 +17,19 @@ knitr::opts_chunk$set(
 
 # Introduction
 
-The **smoothscale** package provides functions for estimating counts and prevalences in multiple small populations. Typical applications would be estimating the number of people below the poverty line in multiple villages, or estimating the prevalence of child labour in multiple districts.
+The **smoothscale** package provides functions for estimating counts and prevalences in multiple small populations. The outcomes of interest include attributes such as being below a poverty line, or being engaged in child labour.
 
-Methods for constructing estimates for multiple small populations are referred to by statisticians as "small area estimation" [@rao2015small,@eclac2022child]. Many of these methods are complex, and require specialist statistical skills to implement and interpret. The methods in **smoothscale** are deliberately simple.
+Attempts to estimate counts and prevalences in small populations often have to content with two types of errors: sampling errors and measurement errors. Statisticans have developed many methods for dealing with these type of errors, under the heading of "small area estimation" [@rao2015small,@eclac2022child] and measurement error models REFERENCE. Many of these methods are complex, and require specialist statistical skills to implement and interpret. The methods implemented in **smoothscale** are, in contrast, deliberately simple.
 
-Estimating counts and prevalences for small populations can be challenging. The challenges can often be traced back to two sorts of errors:
-
-1. sampling errors,
-2. measurement errors.
-
-The **smoothscale** package provides functions for each of these types of errors. This vignette describes each of these errors, and the associated **smoothscale** functions. It then discusses two complications that often arise in practice: the need to stratify by additional variables such as age and sex/gender, and the needs to analyse data that has both sampling errors and measurement errors.
+This vignette defines sampling error and measurement error, and describes how they are dealt with by functions `smooth_prob()`, and `scale_prob()`, including a description of the statistical models that they implement. The vignette then discusses two further issues: stratification by additional variables such as age and sex/gender, and interactions between sampling and measurement errors.
 
 # Sampling Errors
 
-We would like to estimate the prevalence of some attribute, such as employment or school attendance, in each of $k = 1, \cdots, K$ small areas. We have data on $n_k$ people from each area. A subset $x_k$ of people in each area have the attribute in question. Data on school attendance, for instance, might look like this:
+## The setting
+
+We would like to estimate the prevalence of some attribute, such as employment or school attendance, in each of $k = 1, \cdots, K$ small areas. We are interested in the absolute number of people with the attribute in each area and in how the underlying propensity to have the attribute varies across areas. 
+
+We have data on $n_k$ people from each area. A subset $x_k$ of people in each area have the attribute in question. Data on school attendance, for instance, might look like this:
 
 | District | Respondents  | Respondents attending school |
 |:---------|:------------:|:----------------------------:|
@@ -39,10 +38,9 @@ We would like to estimate the prevalence of some attribute, such as employment o
 | $\vdots$ |     $\vdots$ |                     $\vdots$ |
 |     1156 |           54 |                           41 |
 
+If the data come from a census or administrative system, then the number of repondents may be approximately equal to size of the target population in each area. The number of children captured in the census, for instance, should be close to the actual number of children living in an area.
 
-If the data come from a census or administrative system, then the number of repondents may be a good approximation of the size of the target population in each area. The number of children captured in the census, for instance, should be close to the actual number of children living in an area.
-
-If, however, the data come from a survey, then the number of respondents is likely to be much lower than the number of people in the target population. In this case, to estimate counts of people with the attribute in each area, we need an additional set of data, $N_k$, $k = 1, \cdots, K$, on the size of the target population in each area.  Data on a target population of school-age children, for instance, might look like this:
+If, however, the data come from a survey, then the number of respondents is likely to be much smaller than the number of people in the target population. In this case, to estimate counts of people with the attribute in each area, we need an additional set of data, $N_k$, $k = 1, \cdots, K$, on the size of the target population in each area.  Data on a target population of school-age children, for instance, might look like this:
 
 | District | Total school-age children  |
 |:---------|:--------------------------:|
@@ -52,63 +50,82 @@ If, however, the data come from a survey, then the number of respondents is like
 |     1156 |                       2994 |
 
 
+## The statistical challenge
 
-## Statistical challenges
+All of the attributes that we might be interested in are, to some extent, affected by random variation. Whether a particular child is involved in child labour, for instance, depends partly on random factors such as the economic status of the child's family, and the accessibility of the local school. We can therefore thing of the number of people with the attribute has having two components:
 
-- why not just use $x$ or $x/n$?
-- types of sampling error
-    - incomplete sample
-    - super-population
+1. an underlying, `expected' value, and
+2. random error.
 
-When counts are small, it can be difficult to estimate underlying probabilities. Consider, for instance, the problem of trying to estimate the probability of being employed in a population consisting of 5 people, 2 of whom are currently employed. The observed proportion of people who are currently employed is 2/5 = 0.4. In the absence of any other information, it is reasonable to conclude that the underlying probability of being employed is also 0.4. But it is hard to have much confidence in this conclusion. Employment is governed by random, idiosyncratic factors, and, in a population of only 5 people, it would be easy for the number of employed people to jump around, without any change in the underlying probability of being employed.
+Similarly, the proportion of people in an area who have an attribute can be thought of as having two components:
 
-Consider, instead, a population where there are 5000 people, of whom 2000 are currently employed. We would be much more confident in saying that the probability of being employed in this population is somewhere near 0.4. In large populations, there is much more scope for random, idiosyncratic factors to cancel out, so that the observed proportion stays close to the underlying probability.
+1. an underlying propensity to have the attribute, and
+2. random error.
 
-Small counts are a problem for estimating underlying probabilities even when data include everyone from the population of interest. If a dataset only has information on 5 cases, it does not matter whether (1) the cases were randomly selected from a much larger population, or (2) the population in fact only has 5 people. In both cases, the challenge is to strip out the effects of random variation, and get at underlying propensities.
+The idea 'underlying propensity' is abstract, but nevertheless useful. Consider, for instance, a population of 10 people in which no one dies during the year. The observed proportion of people dying is zero. However, we would not think that the underlying propensity -- the true risk of dying -- was also zero.
 
+In large populations, random errors tend to cancel out, so that observed numbers and proportions can be reliable indicators of underlying propensities. In small populations, there is much less scope for errors cancelling, so that observed numbers and proportions are much more noisy indicators.
 
+Consider, for instance, two hypothetical areas:
 
-## Model
+| Area | Children      | Children engaged in child labour |
+|:-----|:-------------:|:--------------------------------:|
+| A    | 500           | 100                              |     
+| B    | 5             | 1                                |
 
-Function `smooth_prob()` treats the number of people in area $k$ with attribute of interest, denoted $x_k$, as a random draw from a binomial distribution,
+The `direct' estimate of the probability of having an attribute is the number of people with the attribute divided by the number of people, $x_k / n_k$. The direct estimate for Area A is the same as the direct estiamte for Area B, at 0.2. But we would be far less confident in the accuracy of the estimates for Area B than we would be in the estimate for Area B, since it is much easier for random variation to pull the observed proportion away from the true underlying probability in a small population than in a large population.
+
+In many applications, we would like to strip away the random variation, and get at underlying expected values and propensities. In other words, we would like to replace the direct estimate $x_k / n_k$ an estimate that is less subject to random variation.
+
+## Statistical model
+
+Function `smooth_prob()` produces smoothed estimates for that try to compensate for the effects of random variation. The model draws on ideas from Bayesian statistics [@gelman2014bayesian], but in contrast to a fully Bayesian analysis, `smooth_prob()` only yields point estimates.
+
+The estimates are based on a statistical model. The number of people in area $k$ with attribute of interest is treated as a random draw from a binomial distribution,
 \begin{equation}
   x_k \sim \text{Binomial}(n_k, \pi_k),
 \end{equation}
-where $n_k$ is the total number of people (with or without the attribute), and $\pi_k$ is the probability of having the attribute.
+where $\pi_k$ is the probability of having the attribute. The goal is to estimate $\pi_k$ for all $K$ areas.
 
-The probabilities $\pi_k$ are treated as coming from a beta distribution,
+The $\pi_k$ are treated as coming from a beta distribution,
 \begin{equation}
   \pi_k \sim \text{Beta}(\alpha, \beta).
 \end{equation}
-In doing so, `smooth_prob()` is assuming that probabilities across the different areas are similar, but not identical.
+The values of $\pi_k$ are assumed to be distributed around a central value. The location of that central value, and the tightness of the distribution depends on the values taken by parameters $\alpha$ and $\beta$, which are estimated from the data.
 
-The degree to which they are similar, and the mean across the different areas, depends on parameters $\alpha$ and $\beta$. These parameters are estimated within the model.
-
-Parameters $\alpha$ and $\beta$ are transformed into $\lambda$ and $\nu$,
+When estimating $\alpha$ and $\beta$ it is convenient to first transform them into new parameters with clearer interprentations,
 \begin{align}
   \alpha & = \lambda \nu \\
   \beta & = (1 - \lambda) \nu
 \end{align}
-with $0 < \lambda < 1$ and $\nu > 0$. The expected value for $\pi_k$ equals $\lambda$, and the amount of variability in $\pi$ is governmed by $\nu$. The $\lambda$ and $\nu$ parameters are both given weak priors,
-\begin{align}
-  \lambda & \sim \text{Unif}(0, 1) \\
-  \nu & \sim \text{Cauchy}^+(0, M).
-\end{align}
-
-
+Parameters $\lambda$ is the expected value for $\pi_k$, and parameter $\nu$ how tightly the $\pi_k$ are clustered around $\lambda$ (with larger values implying tighter clustering). No constraints are placed on $\lambda$, except that is restricted to the range
+$0 < \lambda < 1$. The $\nu$ parameter is assumed to come from a log-Normal distribution,
 \begin{equation}
-  \hat{x}_k = \hat{\pi}_k n_k
+  \nu \sim \text{LogNormal}^+(M, 1),
+\end{equation}
+with $M$ set at at a value of $\log 10$. The distributional assumptions about $\nu$ have virtually no impact on estimates except when the number of small areas and the population of each area are smll, in which case they help stabilise the estimates.
+
+Fitted values for $\lambda$ and $\nu$ can be obtained by finding the values that maximise the quantity quantity
+\begin{equation}
+  \prod_{k=1}^K \text{BetaBinom}(x_k | n_k, \lambda \nu, (1 - \lambda) \nu) \text{LogNormal}(\nu | \log 10, 1).
+\end{equation}
+(This quantity is proportional to the posterior distribution, or, in non-Bayesian terms, to the penalised likelihood. See @enwiki:1184063616 on the definition of the beta-binomial distribution.) Values for the $\pi_k$ can then be derived using the proporties of the binomial and beta distributions [@enwiki:1167875362]. The fitted value for $\pi_k$ is
+\begin{equation}
+  \hat{\pi}_k = \phi_k \frac{x_k}{n_k} + (1 - \phi_k) \hat{\lambda}
+\end{equation}
+where
+\begin{equation}
+  \phi_k = \frac{n_k}{n_k + \hat{\nu}_k}.
 \end{equation}
 
+A smoothed value for the count of people with the attribute is then $\hat{\pi}_k N_k$ (which equals $\hat{\pi}_ n_k$ in cases where $n_k$ comes from a complete enumeration of the population.)
 
-
-
-[present model]
-[show estimator]
-[inference]
 
 ## Partial pooling
 
+The fitted value $\hat{\pi}_k$ is a weighted average of the direct estimate for area $k$, $\frac{x_k}{n_k}$, and central value $\hat{\lambda}$. The weights depend on sample size $n_k$. The higher $n_k$ is, the closer $w_k$ is to 1, and the closer $\hat{\pi}$ is to direct $\frac{x_k}{n_k}$. Conversely, values of $\hat{\pi}_k$ where $n_k$ is small will lie close to $\hat{\lambda}$. REFER TO FIRST VIGNETTE.
+
+WHY IS THIS A GOOD THING.
 
 # Measurement error
 
