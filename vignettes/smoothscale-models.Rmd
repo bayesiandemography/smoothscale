@@ -216,9 +216,9 @@ The national-level prevalences required by `scale_prob()` might like this:
 
 The derivation of the estimator used by `smooth_prob()` refers only to sampling error, and the derivation of the estimator used by `scale_prob()` refers only to measurement error. What if data are subject to substantial sampling error *and* measurement error?
 
-In principle, there might be advantages to modelling sampling error and measurement error simultaneously. However, doing so would require extra assumptions about the nature of the measurement errors, and the ways that these interacted with sample size. This would add extra complexity.
+In principle, there might be advantages to modelling sampling error and measurement error simultaneously. However, doing so would require extra assumptions about the nature of the measurement errors, and the ways that these interacted with sample size.
 
-In practice, a simpler approach, where `smooth_prob()` is applied to deal with sampling error, and then `scale_prob()` is applied to deal with measurement error, is probably sufficient. 
+The recommended approach with **smoothscale** is instead to use `smooth_prob()` to deal with sampling error, and then use `scale_prob()` to deal with measurement error. This approach is much simpler, and given the difficulty of formulating assuptions about measurement errors, is probably just as accurate.
 
 
 
@@ -241,3 +241,5 @@ and, when adusting downwards,
    \sum_{k=1}^K w_k \epsilon_k = \sum_{k=1}^K w_k \frac{p_k}{\bar{p}} \bar{\epsilon} = \frac{\bar{p}}{\bar{p}} \bar{\epsilon} = \bar{\epsilon},
 \end{equation}
 as required.
+
+# References

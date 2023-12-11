@@ -4,37 +4,40 @@
 \alias{smooth_prob}
 \title{Smooth Probabilities}
 \usage{
-smooth_prob(x, size, prior_cases = 100)
+smooth_prob(x, size, prior_cases = 10)
 }
 \arguments{
-\item{x}{Number of successes.}
+\item{x}{Number of successes in each population.
+A numeric vector.}
 
-\item{size}{Number of trials.}
+\item{size}{Number of trials in each population.
+A numeric vector.}
 
-\item{prior_cases}{Variable used to
-control smoothing. Default is 100.}
+\item{prior_cases}{Parameter controlling
+smoothing. Default is \code{10}.}
 }
 \value{
-A numeric vector.
+A numeric vector with the
+smoothed probabilities.
 }
 \description{
-Given data on numbers of trials and numbers
-of successes in multiple subpopulations,
-calculate smoothed probabilities of success
-in each subpopulation. For instance,
-given  numbers of respondents, and numbers of
-employed respondents across many small areas,
-calculate smoothed probabilities
-of being employed for each area. The smoothing
-process pulls probabilities towards the overall mean,
-pulling probabilities based on small counts
-further than probabilities based on large counts.
+Calculate probabilities for multiple population.
+Given data on the number of 'trials' and 'succession'
+in each population, calculate the
+probability of success in each population.
+For instance, given data on the number of respondent,
+and number of employed respondents, by area,
+calculate the probability of being
+employed in each area. The probabilities are smoothed:
+the values are shifted towards the overall mean,
+with values that are based on small sample sizes being
+shifted the furtherst.
 }
 \section{Stratifying}{
 
 
 It is often appropriate to stratify a population
-and to smooth separately within each strata.
+and smooth separately within each strata.
 For instance, when estimating probabilities of
 being employed, it may be appropriate to divide
 the population into strata defined by age and sex.
@@ -44,10 +47,20 @@ is to use \href{https://dplyr.tidyverse.org/reference/group_data.html}{grouped}
 data frames. See below for an example.
 }
 
+\section{\code{prior_counts}}{
+
+
+The argument \code{prior_counts} controls the degree
+of smoothing. It only has a noticeable effect
+when the number of areas, and the population per
+area, is small. Larger values for \code{prior_counts}
+produce more smoothing.
+}
+
 \section{Mathematical details}{
 
 
-The model is
+The smoothing is based on the model
 
 \deqn{x_k \sim \text{Binom}(n_k, \pi_k)}
 
@@ -55,29 +68,27 @@ The model is
 
 \deqn{\lambda \sim \text{Unif}(0, 1)}
 
-\deqn{\nu \sim \text{Cauchy}^+(m)}
+\deqn{\nu \sim \text{LogNormal}^+(\log M, 1)}
 
 where
 \itemize{
+\item \eqn{k} indexes area or population,
 \item \eqn{x_k} is the number of successes, which is
 specified by argument \code{x}
 \item \eqn{n_k} is the number of trials, which is
 specified by argument \code{size}
-\item \eqn{\pi} is the smoothed probability
-of success, the return value from \code{smooth_prob()}, and
-\item \eqn{m} is a parameter to control smoothing,
-which is specified by argument \code{prior_counts}.
+\item \eqn{\pi_k} is the probability of success, and
+\item \eqn{M} control smoothing, and can be
+specified by argument \code{prior_counts}.
 }
 
+\code{smooth_prob()} returns \eqn{\hat{\pi}_k}, the
+maximum posterior density estimate of \eqn{\pi_k}.
+
 The "direct" (unsmoothed) estimate of the
-probability of success in subpopulation \eqn{k}
-is \eqn{x_k / n_k}.
+probability of success is \eqn{x_k / n_k}.
 
-The value for \eqn{m} only has a noticeable effect
-on the results when the number of groups, and the
-counts within each group, are small.
-
-For details on the model, see the vignette.
+For details on the model, see the vignette LINK TO VIGNETTE.
 }
 
 \examples{
@@ -91,7 +102,7 @@ smoothed
 
 ## compare smoothed and unsmoothed ("direct") estimates
 unsmoothed <- census$child_labour / census$all_children
-rbind(smoothed, unsmoothed)
+rbind(head(smoothed), head(unsmoothed))
 
 ## use tidyverse functions to smooth
 ## each age-sex group towards a

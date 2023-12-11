@@ -73,41 +73,41 @@ test_that("'check_prior_cases' raises correct error with negative", {
 
 
 
-## 'check_total' --------------------------------------------------------------
+## 'check_prob_target' --------------------------------------------------------
 
-test_that("'check_total' returns TRUE with valid inputs", {
-    expect_true(check_total(c(100, 100, 100), nm = "total"))
-    expect_true(check_total(0, nm = "total"))
+test_that("'check_prob_target' returns TRUE with valid inputs", {
+    expect_true(check_prob_target(c(0.5, 0.5, 0.5), nm = "prob_target"))
+    expect_true(check_prob_target(0, nm = "prob_target"))
 })
 
-test_that("'check_total' raises correct error with non-numeric", {
-    expect_error(check_total("a", nm = "total"),
-                 "`total` is not numeric.")
+test_that("'check_prob_target' raises correct error with non-numeric", {
+    expect_error(check_prob_target("a", nm = "prob_target"),
+                 "`prob_target` is not numeric.")
 })
 
-test_that("'check_total' raises correct error with infinite", {
-    expect_error(check_total(Inf, nm = "total"),
-                 "`total` has infinite values.")
+test_that("'check_prob_target' raises correct error with NA", {
+    expect_error(check_prob_target(NA_real_, nm = "prob_target"),
+                 "`prob_target` has NAs.")
 })
 
-test_that("'check_total' raises correct error with NA", {
-    expect_error(check_total(NA_real_, nm = "total"),
-                 "`total` has NAs.")
+test_that("'check_prob_target' raises correct error with negative", {
+    expect_error(check_prob_target(-1, nm = "prob_target"),
+                 "`prob_target` has negative values.")
 })
 
-test_that("'check_total' raises correct error with negative", {
-    expect_error(check_total(-1, nm = "total"),
-                 "`total` has negative values.")
+test_that("'check_prob_target' raises correct error with greater than 1", {
+    expect_error(check_prob_target(2, nm = "prob_target"),
+                 "`prob_target` has values greater than 1.")
 })
 
-test_that("'check_total' raises correct error with length 0", {
-    expect_error(check_total(numeric(), nm = "total"),
-                 "`total` has length 0.")
+test_that("'check_prob_target' raises correct error with length 0", {
+    expect_error(check_prob_target(numeric(), nm = "prob_target"),
+                 "`prob_target` has length 0.")
 })
 
-test_that("'check_total' raises correct error with unequal values", {
-    expect_error(check_total(c(1, 1, 1, 2), nm = "total"),
-                 "Element 4 of `total` \\(2\\) not equal to element 1 \\(1\\).")
+test_that("'check_prob_target' raises correct error with unequal values", {
+    expect_error(check_prob_target(c(1, 1, 1, 0.2), nm = "prob_target"),
+                 "Element 4 of `prob_target` \\(0.2\\) not equal to element 1 \\(1\\).")
 })
 
 

@@ -9,11 +9,11 @@
 \strong{smoothscale} contains two functions for
 simple small area estimation:
 \itemize{
-\item \code{\link[=smooth_count]{smooth_count()}} deals with sampling error in counts
+\item \code{\link[=smooth_prob]{smooth_prob()}} deals with sampling error in probabilities
 by pulling them towards an overall average
-\item \code{\link[=scale_count]{scale_count()}} deals with measurement error in counts
+\item \code{\link[=scale_prob]{scale_prob()}} deals with measurement error in probabilities
 by scaling them to be consistent with a (reliable)
-overall total
+overall total!
 }
 }
 \details{

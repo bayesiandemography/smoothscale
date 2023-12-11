@@ -70,35 +70,37 @@ check_prior_cases <- function(prior_cases) {
 
 
 ## HAS_TESTS
-#' Check 'total' argument
+#' Check 'prob_target' argument
 #'
-#' Check that 'total' is a non-negative numeric vector,
-#' with identical elements.
+#' Check that 'prob_target' is a numeric vector where,
+#' if there is more than one element, the elements
+#' are identical. The element(s) must be between
+#' 0 and 1.
 #'
-#' @param total Numeric vector.
+#' @param prob_target Numeric vector.
 #' @param nm Name to be used in error messages.
 #'
 #' @returns TRUE, invisibly
 #'
 #' @noRd
-check_total <- function(total, nm) {
-    if (!is.numeric(total))
+check_prob_target <- function(prob_target, nm) {
+    if (!is.numeric(prob_target))
         cli::cli_abort(c("{.arg {nm}} is not numeric.",
-                         i = "{.arg {nm}} has class {.cls {class(total)}}."))
-    if (any(is.infinite(total)))
-        cli::cli_abort("{.arg {nm}} has infinite values.")
-    if (anyNA(total))
+                         i = "{.arg {nm}} has class {.cls {class(prob_target)}}."))
+    if (anyNA(prob_target))
         cli::cli_abort("{.arg {nm}} has NAs.")
-    if (any(total < 0))
+    if (any(prob_target < 0))
         cli::cli_abort("{.arg {nm}} has negative values.")
-    if (identical(length(total), 0L))
+    if (any(prob_target > 1))
+        cli::cli_abort("{.arg {nm}} has values greater than 1.")
+    if (identical(length(prob_target), 0L))
         cli::cli_abort("{.arg {nm}} has length 0.")
-    if (length(total) > 1L) {
-        is_unequal <- total != total[[1L]]
+    if (length(prob_target) > 1L) {
+        is_unequal <- prob_target != prob_target[[1L]]
         i_unequal <- match(TRUE, is_unequal, nomatch = 0L)
         if (i_unequal > 0L)
-            cli::cli_abort(paste("Element {i_unequal} of {.arg {nm}} ({total[[i_unequal]]})",
-                                 "not equal to element 1 ({total[[1L]]})."))
+            cli::cli_abort(paste("Element {i_unequal} of {.arg {nm}} ({prob_target[[i_unequal]]})",
+                                 "not equal to element 1 ({prob_target[[1L]]})."))
     }
     invisible(TRUE)
 }

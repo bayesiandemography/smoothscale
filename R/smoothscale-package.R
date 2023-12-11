@@ -3,11 +3,11 @@
 #'
 #' **smoothscale** contains two functions for
 #' simple small area estimation:
-#' - [smooth_count()] deals with sampling error in counts
+#' - [smooth_prob()] deals with sampling error in probabilities
 #'   by pulling them towards an overall average
-#' - [scale_count()] deals with measurement error in counts
+#' - [scale_prob()] deals with measurement error in probabilities
 #'   by scaling them to be consistent with a (reliable)
-#'   overall total
+#'   overall total!
 #'
 #' **smoothscale** also contains a synthetic dataset
 #' called [syn_census].
