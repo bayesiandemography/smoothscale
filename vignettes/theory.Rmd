@@ -1,6 +1,6 @@
 ---
 title: "Statistical Models used for Smoothing and Scaling"
-output: rmarkdown::html_vignette
+output: bookdown::html_document2
 vignette: >
   %\VignetteIndexEntry{Statistical Models used for Smoothing and Scaling}
   %\VignetteEngine{knitr::rmarkdown}
@@ -17,19 +17,17 @@ knitr::opts_chunk$set(
 
 # Introduction
 
-The **smoothscale** package provides functions for estimating counts and prevalences in multiple small populations. The outcomes of interest include attributes such as being below a poverty line, or being engaged in child labour.
+The **smoothscale** package provides functions for estimating counts and prevalences in small populations. The functions deal with two of the problems that often arise when doing this sort of estimation: sampling errors and measurement errors. Statisticans have developed many methods for estimation in small populations, under the headings of "small area estimation" [@rao2015small]. Many of these methods are complex, and require specialist statistical skills. The methods used in **smoothscale** are, in contrast, deliberately simple.
 
-Attempts to estimate counts and prevalences in small populations often have to content with two types of errors: sampling errors and measurement errors. Statisticans have developed many methods for dealing with these type of errors, under the heading of "small area estimation" [@rao2015small,@eclac2022child] and measurement error models REFERENCE. Many of these methods are complex, and require specialist statistical skills to implement and interpret. The methods implemented in **smoothscale** are, in contrast, deliberately simple.
-
-This vignette defines sampling error and measurement error, and describes how they are dealt with by functions `smooth_prob()`, and `scale_prob()`, including a description of the statistical models that they implement. The vignette then discusses two further issues: stratification by additional variables such as age and sex/gender, and interactions between sampling and measurement errors.
+This vignette defines sampling and measurement errors, and describes how they are dealt with by functions in **smoothscale**. The vignette then discusses two further issues: stratification by additional variables such as age and sex/gender, and interactions between sampling and measurement errors.
 
 # Sampling Errors
 
 ## The setting
 
-We would like to estimate the prevalence of some attribute, such as employment or school attendance, in each of $k = 1, \cdots, K$ small areas. We are interested in the absolute number of people with the attribute in each area and in how the underlying propensity to have the attribute varies across areas. 
+We would like to estimate the prevalence of some attribute, such as employment or school attendance, in each of $k = 1, \dots, K$ small areas. We are interested in absolute numbers and in underlying probabilities.
 
-We have data on $n_k$ people from each area. A subset $x_k$ of people in each area have the attribute in question. Data on school attendance, for instance, might look like this:
+We have data on $n_k$ people from each area. The number of people in each area who are reported to have the attribute in question is $x_k$. In the following hypothetical data, for instance, $n_k$ is the number of respondents in each distribution, and $x_k$ is the number of respondents who attend school:
 
 | District | Respondents  | Respondents attending school |
 |:---------|:------------:|:----------------------------:|
@@ -38,152 +36,150 @@ We have data on $n_k$ people from each area. A subset $x_k$ of people in each ar
 | $\vdots$ |     $\vdots$ |                     $\vdots$ |
 |     1156 |           54 |                           41 |
 
+
 If the data come from a census or administrative system, then the number of repondents may be approximately equal to size of the target population in each area. The number of children captured in the census, for instance, should be close to the actual number of children living in an area.
 
-If, however, the data come from a survey, then the number of respondents is likely to be much smaller than the number of people in the target population. In this case, to estimate counts of people with the attribute in each area, we need an additional set of data, $N_k$, $k = 1, \cdots, K$, on the size of the target population in each area.  Data on a target population of school-age children, for instance, might look like this:
+If, however, the data come from a sample extracted from the census, then the number of respondents is likely to be much smaller than the number of people in the target population. In this case, to estimate counts of people with the attribute in each area, we need an additional set of data, $N_k$, $k = 1, \cdots, K$, on the size of the target population in each area.  Data on a target population of school-age children, for instance, might look like this:
 
 | District | Total school-age children  |
 |:---------|:--------------------------:|
-|     1001 |                       4027 |
-|     1002 |                       1382 |
+|     1001 |                       8301 |
+|     1002 |                       2500 |
 | $\vdots$ |                   $\vdots$ |  
-|     1156 |                       2994 |
+|     1156 |                       5402 |
 
 
-## The statistical challenge
+Observed prevalences always, to some extent, reflect random variation. Whether a particular child is involved in child labour, for instance, depends partly on random factors such as the economic status of the child's family. If the data come from a survey, then the sample selection procedures add further randomness. We can therefore think of the number of people with the attribute as reflecting
 
-All of the attributes that we might be interested in are, to some extent, affected by random variation. Whether a particular child is involved in child labour, for instance, depends partly on random factors such as the economic status of the child's family, and the accessibility of the local school. We can therefore thing of the number of people with the attribute has having two components:
-
-1. an underlying, `expected' value, and
+1. a stable 'expected' value, and
 2. random error.
 
-Similarly, the proportion of people in an area who have an attribute can be thought of as having two components:
+Similarly, the proportion of people in an area who have an attribute reflects
 
 1. an underlying propensity to have the attribute, and
 2. random error.
 
-The idea 'underlying propensity' is abstract, but nevertheless useful. Consider, for instance, a population of 10 people in which no one dies during the year. The observed proportion of people dying is zero. However, we would not think that the underlying propensity -- the true risk of dying -- was also zero.
+In small populations, it can be essential to distinguish between an observed proportion and an underlyign propensity. Consider, for instance, a population of 10 people in which, during a given yer, no one dies. The observed proportion of people dying for that year is zero. However the underlying propensity -- the risk of dying that people in fact faced during the year -- was not zero.
 
-In large populations, random errors tend to cancel out, so that observed numbers and proportions can be reliable indicators of underlying propensities. In small populations, there is much less scope for errors cancelling, so that observed numbers and proportions are much more noisy indicators.
-
-Consider, for instance, two hypothetical areas:
-
-| Area | Children      | Children engaged in child labour |
-|:-----|:-------------:|:--------------------------------:|
-| A    | 500           | 100                              |     
-| B    | 5             | 1                                |
-
-The `direct' estimate of the probability of having an attribute is the number of people with the attribute divided by the number of people, $x_k / n_k$. The direct estimate for Area A is the same as the direct estiamte for Area B, at 0.2. But we would be far less confident in the accuracy of the estimates for Area B than we would be in the estimate for Area B, since it is much easier for random variation to pull the observed proportion away from the true underlying probability in a small population than in a large population.
-
-In many applications, we would like to strip away the random variation, and get at underlying expected values and propensities. In other words, we would like to replace the direct estimate $x_k / n_k$ an estimate that is less subject to random variation.
+In large populations, random errors tend to cancel out, so that observed counts can be reliable indicators of underlying propensities. In small populations, there is much less scope for cancellation, so that observed counts are much more noisy. The statistical challenge is to minimise the effects of the noise, and to get at the underlying expected values and propensities.
 
 ## Statistical model
 
-Function `smooth_prob()` produces smoothed estimates for that try to compensate for the effects of random variation. The model draws on ideas from Bayesian statistics [@gelman2014bayesian], but in contrast to a fully Bayesian analysis, `smooth_prob()` only yields point estimates.
+Function `smooth_prob()` produces smoothed estimates that try to strip out the effects of random variation. The model draws on ideas from Bayesian statistics [@gelman2014bayesian], but in contrast to a fully Bayesian analysis, `smooth_prob()` only yields point estimates.
 
-The estimates are based on a statistical model. The number of people in area $k$ with attribute of interest is treated as a random draw from a binomial distribution,
+The estimates are based on a statistical model. The number of people in area $k$ with the attribute of interest is treated as a random draw from a binomial distribution,
 \begin{equation}
   x_k \sim \text{Binomial}(n_k, \pi_k),
 \end{equation}
-where $\pi_k$ is the probability of having the attribute. The goal is to estimate $\pi_k$ for all $K$ areas.
+where $\pi_k$ is the probability of having the attribute. The job of `smooth_prob()` is to estimate $\pi_k$ for all $K$ areas.
 
-The $\pi_k$ are treated as coming from a beta distribution,
+Function `smooth_prob()` assumes that the $\pi_k$ come from a beta distribution,
 \begin{equation}
   \pi_k \sim \text{Beta}(\alpha, \beta).
 \end{equation}
-The values of $\pi_k$ are assumed to be distributed around a central value. The location of that central value, and the tightness of the distribution depends on the values taken by parameters $\alpha$ and $\beta$, which are estimated from the data.
+The centre of this distribution, and the extent to which the values concentrate around the centre, are determined by parameters $\alpha$ and $\beta$. Values for these parameters are estimated from the data.
 
-When estimating $\alpha$ and $\beta$ it is convenient to first transform them into new parameters with clearer interprentations,
+Rather than work directly with $\alpha$ and $\beta$, we express them in terms of two new parameters,
 \begin{align}
   \alpha & = \lambda \nu \\
   \beta & = (1 - \lambda) \nu
 \end{align}
-Parameters $\lambda$ is the expected value for $\pi_k$, and parameter $\nu$ how tightly the $\pi_k$ are clustered around $\lambda$ (with larger values implying tighter clustering). No constraints are placed on $\lambda$, except that is restricted to the range
-$0 < \lambda < 1$. The $\nu$ parameter is assumed to come from a log-Normal distribution,
+Parameter $\lambda$ is the central value for $\pi_k$, and parameter $\nu$ governs how tightly the $\pi_k$ are concentrated around $\lambda$, with larger values implying greater concentration. We do not place any constraints on $\lambda$, except to restrict it to the range
+$0 < \lambda < 1$. We assume that the $\nu$ parameter comes from a log-normal distribution,
 \begin{equation}
-  \nu \sim \text{LogNormal}^+(M, 1),
+  \nu \sim \text{LogNormal}(\log 10, 1).
 \end{equation}
-with $M$ set at at a value of $\log 10$. The distributional assumptions about $\nu$ have virtually no impact on estimates except when the number of small areas and the population of each area are smll, in which case they help stabilise the estimates.
+The distributional assumptions about $\nu$ have virtually no impact on the estimates of $\pi_k$, except when the number of small areas and the population of each area is small. Placing a soft constraint on $\nu$ does, however, help stabilise estimates at reasonable values when counts are small.
 
-Fitted values for $\lambda$ and $\nu$ can be obtained by finding the values that maximise the quantity quantity
+Fitted values for $\lambda$ and $\nu$ can be obtained by finding the values that maximise the quantity
 \begin{equation}
   \prod_{k=1}^K \text{BetaBinom}(x_k | n_k, \lambda \nu, (1 - \lambda) \nu) \text{LogNormal}(\nu | \log 10, 1).
 \end{equation}
-(This quantity is proportional to the posterior distribution, or, in non-Bayesian terms, to the penalised likelihood. See @enwiki:1184063616 on the definition of the beta-binomial distribution.) Values for the $\pi_k$ can then be derived using the proporties of the binomial and beta distributions [@enwiki:1167875362]. The fitted value for $\pi_k$ is
+This quantity is proportional to the posterior distribution, or, in non-Bayesian terms, to the penalised likelihood. See @enwiki:1184063616 on the definition of the beta-binomial distribution. Values for the $\pi_k$ can then be derived using the properties of the binomial and beta distributions [@enwiki:1167875362]. The fitted value for $\pi_k$ is
+\begin{equation}
+  \hat{\pi}_k = \frac{x_k + \lambda \nu}{n_k + \nu} (\#eq:pihat)
+\end{equation}
+
+A smoothed value for the number of people with the attribute is then $\hat{\pi}_k N_k$, or, when the data are a complete enumeration of the population, $\hat{\pi}_k n_k$.
+
+## Partial pooling
+
+The formula for $\hat{\pi}_k$ given in \@ref(eq:pihat) can be rewritten as 
 \begin{equation}
   \hat{\pi}_k = \phi_k \frac{x_k}{n_k} + (1 - \phi_k) \hat{\lambda}
+    (\#eq:partial)
 \end{equation}
 where
 \begin{equation}
   \phi_k = \frac{n_k}{n_k + \hat{\nu}_k}.
 \end{equation}
+The quantity $\frac{x_k}{n_k}$ in \@ref(eq:partial) is the traditional 'direct' estimate of the probability in area $k$. The direct estimate is based entirely on data for area $k$, with no smoothing. The parameter $\hat{\lambda}$ is an estimate of the average value across all areas, and uses all available data. The parameter $\phi_k$ is type of weight, which is close to 1 when $n_k$ is large, and close to 0 when $n_k$ is small.
 
-A smoothed value for the count of people with the attribute is then $\hat{\pi}_k N_k$ (which equals $\hat{\pi}_ n_k$ in cases where $n_k$ comes from a complete enumeration of the population.)
+Equation \@ref(eq:partial) shows how $\hat{\pi}_k$ can be regarded a compromise between the local estimate $\frac{x_k}{n_k}$ and the global estimate $\hat{\lambda}$. The way that the weights $\phi_k$ are constructed means that the local estimate exerts greater influence when there is more data to support it, and less influence when there is less data to support it. This data-driven balancing of local and global estimates is common in small area estimation, where it is known, among other things, as "partial pooling". Partial pooling makes intuitive sense, and usually performs well in practice.
 
+A characteristic of partially-pooled estimates is that they are more tightly concentrated than direct estimates. This is a form of smoothing, also referred to as shrinkage or regularisation. The estimator in \@ref(eq:partial) has this property. Partial pooling shifts the $\pi_k$ towards $\hat{\lambda}$, so that they are more concentrated than the direct estimates $\frac{x_k}{n_k}$.
 
-## Partial pooling
-
-The fitted value $\hat{\pi}_k$ is a weighted average of the direct estimate for area $k$, $\frac{x_k}{n_k}$, and central value $\hat{\lambda}$. The weights depend on sample size $n_k$. The higher $n_k$ is, the closer $w_k$ is to 1, and the closer $\hat{\pi}$ is to direct $\frac{x_k}{n_k}$. Conversely, values of $\hat{\pi}_k$ where $n_k$ is small will lie close to $\hat{\lambda}$. REFER TO FIRST VIGNETTE.
-
-WHY IS THIS A GOOD THING.
 
 # Measurement error
 
-## Goal
+## Setting
 
-The area-level tabulations may also be affected by measurement error. For instance, some respondents may have misinterpreted the questions, or the questions may used different definitions from the ones that we need. 
+A second sort of error that often affects small area estimates is measurement error. Measurement error can occur, for instance, when respondents misunderstand the question, when proxy respondents were used, or when the definitions used in the data are different from the ones required by the analysis.
 
-
-- as above
-
-## Data
-
-As above, plus national-level
-
-In some cases, reliable national-level data on prevalences might also be available. There might, for instance, be reliable national-level estimate of the proportion of children attending school. A common source of reliable national-level data is household surveys. Household surveys typically do not have large enough samples to provide stable estimates for small areas. However, they typically do have large enough samples to provide stable estimates at the national level, while also having relatively low measurement errors.
-
-The reliable national-level prevalences may be disaggregated by subpopulation. For instance, national-level school attendance data might look like this:
-
-|   Age | Sex    | Percent of children attending school |
-|-------|--------|:------------------------------------:|
-|   5-9 | Female |                                   92 |
-|   5-9 | Male   |                                   91 |
-| 10-14 | Female |                                   84 |
-| 10-14 | Male   |                                   82 |
-
-
-
-
-## Statistical challenges
-
-- No sampling model
-- Have idea of average size of adjustment, but not particular
+Accounting for measurement errors normally requires some sort of additional data on the true underlying values. Function `scale_prob()`, the function **smoothscale** that deals with measurement error, requires reliable data on national-level prevalences. A typical source of reliable national-level data is household surveys. Although household surveys do not have large enough samples to provide stable estimates for small areas, they do typically have large enough samples to provide stable estimates at the national level, while also having relatively low measurement errors.
 
 ## Model
 
-Let $\pi_k^*$ denote a scaled version of $\pi_k$. We know the national total
+Let $p_k$ be an initial estimate of the probability that a person in area $k$ possesses the attribute in question. We think that $p_k$ differs from the true value $\pi_k$ because of measurement error, that is,
 \begin{equation}
-  \bar{\pi}^* = \sum_{k=1}^K w_k \pi_k^*
+  \pi_k = p_k + \epsilon_k,
 \end{equation}
-and would to derive the individual $\pi_k$. 
+where $\epsilon_k$ is an area-level measurement error. To estimate $\pi_k$, we need a way of estimating $\text{epsilon}_k$.
 
-Assume
+Let
 \begin{equation}
-  \pi_k^* =
-    \begin{cases}
-      \pi_k + \rho (1 - \pi_k) & \text{ if} \pi_k < \bar{\pi}^* \\
-      \pi_k - \rho \pi_k & \text{ otherwise}.
+  w_k = \frac{N_k}{\sum_{k=1}^K N_k} \quad \text{or} \quad \frac{n_k}{\sum_{k=1}^K n_k}, \quad k = 1, \cdots, K, 
+\end{equation}
+be a known set of population weights. Let
+\begin{equation}
+  \bar{p} = \sum_{k=1}^K w_k p_k
+\end{equation}
+be the national-level probability obtained by averaging the initial area-level estimates, and let 
+\begin{equation}
+  \bar{\pi} = \sum_{k=1}^K w_k \pi_k
+\end{equation}
+be the true national-level probability.
+
+We can obtain an accurate estimate of $\hat{\pi}$ from, for instance, a national-level survey, though we do know the individual $\pi_k$. From the national estimate, we can calculate the average error,
+\begin{equation}
+  \bar{\epsilon} = \sum_{k=1}^K w_k \epsilon_k = \sum_{k=1}^K w_k (\pi_k - p_k) = \sum_{k=1}^K w_k \pi_k - \sum_{k=1}^K w_k p_k = \bar{\pi} - \bar{p}. (\#eq:epsilon)
+\end{equation}
+
+We would like to construct an estimator for $\epsilon_k$ with the form
+\begin{equation}
+  \epsilon_k = \alpha_k \bar{\epsilon}
+\end{equation}
+where $\alpha_k$ is an area-specific scaling factor.
+
+The estimator implemented in `scale_prob()` takes slightly different forms when the average error is positive (so that we need to scale upwards) and the average error is negative (so that we need to scale downwards):
+\begin{equation}
+  \alpha_k = \begin{cases}
+    \displaystyle \frac{1 - p_k}{1 - \bar{p}}  & \text{if } \bar{\epsilon} > 0 \\
+    \displaystyle \frac{p_k}{\bar{p}}  & \text{if } \bar{\epsilon} < 0.
     \end{cases}
 \end{equation}
+The scaling factor $\alpha_k$ is irrelevant if $\bar{\epsilon} = 0$, in which case no scaling is necessary.
 
-\begin{equation}
-  \bar{\pi}^* = \sum_{k=1}^K w_k (\pi_k + \rho (1 - \pi_k)) = \bar{\pi} + \rho (1 - \bar{\pi})
-\end{equation}
+When the national-level error $\bar{\epsilon}$ is positive, the $\alpha_k$ are all non-negative, and $\pi_k$ is always greater than or equal to $p_k$. Conversely, when $\bar{\epsilon}$ is negative, the $\alpha_k$ are all non-positive, and $\pi_k$ is always less than than or equal to $p_k$.
 
-\begin{equation}
-  \rho = \frac{\bar{\pi}^* - \bar{\pi}}{1 - \bar{\pi}}
-\end{equation}
+The `scale_prob()` estimator for $\pi_k$ passes some basic sanity checks:
 
+- when adjusting upwards, $\pi_k$ never exceeds 1,
+- when adjusting downwards, $\pi_k$ less never less than 0, and
+- when adjusting in either direction, the $\epsilon_k$ always sum to $\bar{\epsilon}$ as defined in \@ref(eq:epsilon).
+(See the Appendix for details.)
+
+The estimator also smooths the estimates, relative to the original $\pi_k$, pulling them in towards a central value. When adjusting upwards, the size of each adjustment is proportional to $1 - p_k$, implying that unusually low values get large adjustments, and unusually high values get small adjustments. When adjusting downwards, the size of each adjustment is proportional to $p_k$, implying that unusually high values get large adjustments, and unusually low values get small adjustments. The adjustment process pulls extreme values towards the centre, which is reminiscent of the shrinkage that occurs under partial pooling. If we assume that being extreme is a symptom of measurement error, then this smoothing behaviour is, on average, appropriate.
 
 
 # Stratification
@@ -202,6 +198,46 @@ Often the data is also disaggregated by subpopulation. For instance, data disagg
 |     1156 |    10-14 | Female   |           17 |                         5 |
 |     1156 |    10-14 | Male     |           13 |                         8 |
 
+The national-level prevalences required by `scale_prob()` might like this:
 
-# Combining
+|   Age | Sex    | Percent of children attending school |
+|-------|--------|:------------------------------------:|
+|   5-9 | Female |                                   92 |
+|   5-9 | Male   |                                   91 |
+| 10-14 | Female |                                   84 |
+| 10-14 | Male   |                                   82 |
 
+
+**smoothscale** takes a simple approach to disaggregated: estimates are constructed completely independently for each combination of the stratifying variables. For instance, with the data above, estimates would be constructed separately for 5-9 year old females, 5-9 year old males, 10-14 year old females, and 10-14 year old males. Although there might be some gains in accuracy or stability from sharing information across combinations of variables, this would mean sacrificing simplicity and usability.
+
+
+
+# Combinations of sampling and measurement error
+
+The derivation of the estimator used by `smooth_prob()` refers only to sampling error, and the derivation of the estimator used by `scale_prob()` refers only to measurement error. What if data are subject to substantial sampling error *and* measurement error?
+
+In principle, there might be advantages to modelling sampling error and measurement error simultaneously. However, doing so would require extra assumptions about the nature of the measurement errors, and the ways that these interacted with sample size. This would add extra complexity.
+
+In practice, a simpler approach, where `smooth_prob()` is applied to deal with sampling error, and then `scale_prob()` is applied to deal with measurement error, is probably sufficient. 
+
+
+
+# Appendix: Sanity checks for `scale_prob()` estimator
+
+When adjusting upwards, $\pi_k$ is never greater than 1, since
+\begin{equation}
+  \pi_k = p_k + \frac{1 - p_k}{1 - \bar{p}} (\bar{\pi} - \bar{p}) \le p_k + \frac{1 - p_k}{1 - \bar{p}} (1 - \bar{p}) = p_k + 1 - p_k = 1.
+\end{equation}
+Similarly, when adjusting dowwards, $\pi_k$ is less never than 0, since
+\begin{equation}
+  \pi_k = p_k + \frac{p_k}{\bar{p}} (\bar{\pi} - \bar{p}) \ge p_k + \frac{p_k}{\bar{p}} (-\bar{p}) = p_k - p_k = 0.
+\end{equation}
+In addition, when adusting upwards,
+\begin{equation}
+   \sum_{k=1}^K w_k \epsilon_k = \sum_{k=1}^K w_k \frac{1 - p_k}{1 - \bar{p}} \bar{\epsilon} = \frac{1 - \bar{p}}{1 - \bar{p}} \bar{\epsilon} = \bar{\epsilon},
+\end{equation}
+and, when adusting downwards,
+\begin{equation}
+   \sum_{k=1}^K w_k \epsilon_k = \sum_{k=1}^K w_k \frac{p_k}{\bar{p}} \bar{\epsilon} = \frac{\bar{p}}{\bar{p}} \bar{\epsilon} = \bar{\epsilon},
+\end{equation}
+as required.
