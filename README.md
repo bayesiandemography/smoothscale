@@ -8,6 +8,8 @@
 [![R-CMD-check](https://github.com/bayesiandemography/smoothscale/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/bayesiandemography/smoothscale/actions/workflows/R-CMD-check.yaml)
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![Codecov test
+coverage](https://codecov.io/gh/bayesiandemography/smoothscale/branch/main/graph/badge.svg)](https://app.codecov.io/gh/bayesiandemography/smoothscale?branch=main)
 <!-- badges: end -->
 
 Simple small area estimation methods.
