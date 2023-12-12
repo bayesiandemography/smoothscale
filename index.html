@@ -82,24 +82,25 @@
 <span><span class="va">syn_census</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">inner_join</a></span><span class="op">(</span><span class="va">syn_survey</span>, by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"sex"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">sex</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>child_labour_sm <span class="op">=</span> <span class="fu"><a href="reference/smooth_prob.html">smooth_prob</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">child_labour</span>,</span>
-<span>                                       size <span class="op">=</span> <span class="va">all_children</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 200 × 8</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>smoothed <span class="op">=</span> <span class="fu"><a href="reference/smooth_prob.html">smooth_prob</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">child_labour</span>,</span>
+<span>                                size <span class="op">=</span> <span class="va">all_children</span><span class="op">)</span>,</span>
+<span>     scaled <span class="op">=</span> <span class="fu"><a href="reference/scale_prob.html">scale_prob</a></span><span class="op">(</span>unscaled <span class="op">=</span> <span class="va">smoothed</span>,</span>
+<span>                         target <span class="op">=</span> <span class="va">prob_child_labour</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 100 × 8</span></span>
 <span><span class="co">#&gt; # Groups:   age, sex [4]</span></span>
-<span><span class="co">#&gt;    area    age   sex    child_labour all_children total_child_labour</span></span>
-<span><span class="co">#&gt;    &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt;         &lt;int&gt;        &lt;dbl&gt;              &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt;  1 Area 01 5-9   Female           42          368             222365</span></span>
-<span><span class="co">#&gt;  2 Area 02 5-9   Female           10           33             222365</span></span>
-<span><span class="co">#&gt;  3 Area 03 5-9   Female          112          453             222365</span></span>
-<span><span class="co">#&gt;  4 Area 04 5-9   Female          151          354             222365</span></span>
-<span><span class="co">#&gt;  5 Area 05 5-9   Female           23          101             222365</span></span>
-<span><span class="co">#&gt;  6 Area 06 5-9   Female            3            5             222365</span></span>
-<span><span class="co">#&gt;  7 Area 07 5-9   Female            3           14             222365</span></span>
-<span><span class="co">#&gt;  8 Area 08 5-9   Female            6           35             222365</span></span>
-<span><span class="co">#&gt;  9 Area 09 5-9   Female           14           48             222365</span></span>
-<span><span class="co">#&gt; 10 Area 10 5-9   Female          422         1889             222365</span></span>
-<span><span class="co">#&gt; # ℹ 190 more rows</span></span>
-<span><span class="co">#&gt; # ℹ 2 more variables: total_all_children &lt;dbl&gt;, child_labour_sm &lt;dbl&gt;</span></span></code></pre></div>
+<span><span class="co">#&gt;    area  age   sex   child_labour all_children prob_child_labour smoothed scaled</span></span>
+<span><span class="co">#&gt;    &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;        &lt;int&gt;        &lt;dbl&gt;             &lt;dbl&gt;    &lt;dbl&gt;  &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt;  1 Area… 5-9   Fema…          134          372             0.297   0.351   0.414</span></span>
+<span><span class="co">#&gt;  2 Area… 5-9   Fema…           14           35             0.297   0.325   0.390</span></span>
+<span><span class="co">#&gt;  3 Area… 5-9   Fema…           92          388             0.297   0.236   0.310</span></span>
+<span><span class="co">#&gt;  4 Area… 5-9   Fema…           46          345             0.297   0.140   0.223</span></span>
+<span><span class="co">#&gt;  5 Area… 5-9   Fema…           25          102             0.297   0.241   0.314</span></span>
+<span><span class="co">#&gt;  6 Area… 5-9   Fema…            2            5             0.297   0.252   0.324</span></span>
+<span><span class="co">#&gt;  7 Area… 5-9   Fema…            4           13             0.297   0.252   0.324</span></span>
+<span><span class="co">#&gt;  8 Area… 5-9   Fema…           10           34             0.297   0.264   0.335</span></span>
+<span><span class="co">#&gt;  9 Area… 5-9   Fema…            2           52             0.297   0.0995  0.186</span></span>
+<span><span class="co">#&gt; 10 Area… 5-9   Fema…          578         2087             0.297   0.276   0.346</span></span>
+<span><span class="co">#&gt; # ℹ 90 more rows</span></span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="license">
