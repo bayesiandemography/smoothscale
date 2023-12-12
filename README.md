@@ -17,7 +17,8 @@ Simple small area estimation methods.
 ## Installation
 
 ``` r
-devtools::install_github("bayesiandemography/smoothscale")
+devtools::install_github("bayesiandemography/smoothscale", 
+                         build_vignettes = TRUE)
 ```
 
 ## Example
