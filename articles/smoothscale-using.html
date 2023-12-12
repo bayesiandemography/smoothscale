@@ -200,14 +200,14 @@ which also arises often in small area estimation. Function
 <code><a href="../reference/scale_prob.html">scale_prob()</a></code> has three arguments:</p>
 <ul>
 <li>
-<code>prob_report</code> is the original probability estimate for
+<code>prob_unscaled</code> is the original probability estimate for
 each area</li>
 <li>
 <code>prob_target</code> is an overall probability, assumed to be
 error-free</li>
 <li>
 <code>wt</code> is an optional weighting variable, used to calculate
-an overall probability from <code>prob_report</code>.</li>
+an overall probability from <code>prob_unscaled</code>.</li>
 </ul>
 <p>We can use <code><a href="../reference/scale_prob.html">scale_prob()</a></code> to scale the probabilities
 estimated earlier using <code><a href="../reference/smooth_prob.html">smooth_prob()</a></code> so that they match
@@ -216,7 +216,7 @@ those from <code>syn_survey</code> at the national level.</p>
 <code class="sourceCode R"><span><span class="va">scaled_agesex</span> <span class="op">&lt;-</span> <span class="va">smoothed_agesex</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">inner_join</a></span><span class="op">(</span><span class="va">syn_survey</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">sex</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>scaled <span class="op">=</span> <span class="fu"><a href="../reference/scale_prob.html">scale_prob</a></span><span class="op">(</span>prob_report <span class="op">=</span> <span class="va">smoothed</span>,</span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>scaled <span class="op">=</span> <span class="fu"><a href="../reference/scale_prob.html">scale_prob</a></span><span class="op">(</span>prob_unscaled <span class="op">=</span> <span class="va">smoothed</span>,</span>
 <span>                             prob_target <span class="op">=</span> <span class="va">prob_child_labour</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Joining with `by = join_by(age, sex)`</span></span>
