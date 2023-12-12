@@ -25,13 +25,13 @@ devtools::install_github("bayesiandemography/smoothscale")
 ``` r
 library(smoothscale)
 library(dplyr, warn.conflicts = FALSE)
-syn_census %>%
-  inner_join(syn_survey, by = c("age", "sex")) %>%
-  group_by(age, sex) %>%
+syn_census |>
+  inner_join(syn_survey, by = c("age", "sex")) |>
+  group_by(age, sex) |>
   mutate(smoothed = smooth_prob(x = child_labour,
                                 size = all_children),
-     scaled = scale_prob(unscaled = smoothed,
-                         target = prob_child_labour))
+         scaled = scale_prob(unscaled = smoothed,
+                             target = prob_child_labour))
 #> # A tibble: 100 × 8
 #> # Groups:   age, sex [4]
 #>    area  age   sex   child_labour all_children prob_child_labour smoothed scaled
