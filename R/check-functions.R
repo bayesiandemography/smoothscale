@@ -106,12 +106,12 @@ check_prob <- function(prob, all_equal, nm) {
 #' Check 'wt' argument
 #'
 #' @param wt Numeric vector of weights.
-#' @param prob_report Reported probabilities
+#' @param prob_unscaled Reported probabilities
 #'
 #' @returns TRUE, invisibly
 #'
 #' @noRd
-check_wt <- function(wt, prob_report) {
+check_wt <- function(wt, prob_unscaled) {
     if (!is.numeric(wt))
         cli::cli_abort(c("{.arg wt} is not numeric.",
                          i = "{.arg wt} has class {.cls {class(wt)}}."))
@@ -121,9 +121,9 @@ check_wt <- function(wt, prob_report) {
         cli::cli_abort("{.arg wt} has negative values.")
     if (any(is.infinite(wt)))
         cli::cli_abort("{.arg wt} has infinite values.")
-    if (!identical(length(wt), length(prob_report)))
-        cli::cli_abort(c("{.arg wt} and {.arg prob_report} have different lengths.",
+    if (!identical(length(wt), length(prob_unscaled)))
+        cli::cli_abort(c("{.arg wt} and {.arg prob_unscaled} have different lengths.",
                          "{.arg wt} has length {.val {length(wt)}}.",
-                         "{.arg prob_report} has length {.val {length(prob_report)}}."))
+                         "{.arg prob_unscaled} has length {.val {length(prob_unscaled)}}."))
     invisible(TRUE)
 }

@@ -81,7 +81,7 @@ test_that("'check_prob' returns TRUE with valid inputs", {
 })
 
 test_that("'check_prob' returns TRUE with varying values if 'all_equal' is FALSE", {
-  expect_true(check_prob(c(1, 1, 1, 0.2), all_equal = FALSE, nm = "prob_report"))
+  expect_true(check_prob(c(1, 1, 1, 0.2), all_equal = FALSE, nm = "prob_unscaled"))
 })
 
 test_that("'check_prob' raises correct error with non-numeric", {
@@ -118,30 +118,30 @@ test_that("'check_prob' raises correct error with unequal values", {
 ## 'check_wt' ---------------------------------------------------------------
 
 test_that("'check_wt' returns TRUE with valid inputs", {
-  expect_true(check_wt(c(0.5, 0.5, 0.5), prob_report = rep(0.2, 3)))
+  expect_true(check_wt(c(0.5, 0.5, 0.5), prob_unscaled = rep(0.2, 3)))
 })
 
 test_that("'check_wt' raises correct error with non-numeric", {
-  expect_error(check_wt("a", prob_report = 0.3),
+  expect_error(check_wt("a", prob_unscaled = 0.3),
                "`wt` is not numeric.")
 })
 
 test_that("'check_wt' raises correct error with NA", {
-  expect_error(check_wt(NA_real_, prob_report = 0.3),
+  expect_error(check_wt(NA_real_, prob_unscaled = 0.3),
                "`wt` has NAs.")
 })
 
 test_that("'check_wt' raises correct error with negative", {
-  expect_error(check_wt(-1, prob_report = 0.2),
+  expect_error(check_wt(-1, prob_unscaled = 0.2),
                "`wt` has negative values.")
 })
 
 test_that("'check_wt' raises correct error with infinite", {
-  expect_error(check_wt(Inf, prob_report = 0.3),
+  expect_error(check_wt(Inf, prob_unscaled = 0.3),
                "`wt` has infinite values.")
 })
 
-test_that("'check_wt' raises correct error with length not equal to prob_report", {
-  expect_error(check_wt(0.5, prob_report = c(0.2, 0.3)),
-               "`wt` and `prob_report` have different lengths.")
+test_that("'check_wt' raises correct error with length not equal to prob_unscaled", {
+  expect_error(check_wt(0.5, prob_unscaled = c(0.2, 0.3)),
+               "`wt` and `prob_unscaled` have different lengths.")
 })
