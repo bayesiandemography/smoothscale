@@ -28,22 +28,23 @@ library(dplyr, warn.conflicts = FALSE)
 syn_census %>%
   inner_join(syn_survey, by = c("age", "sex")) %>%
   group_by(age, sex) %>%
-  mutate(child_labour_sm = smooth_prob(x = child_labour,
-                                       size = all_children))
-#> # A tibble: 200 × 8
+  mutate(smoothed = smooth_prob(x = child_labour,
+                                size = all_children),
+     scaled = scale_prob(unscaled = smoothed,
+                         target = prob_child_labour))
+#> # A tibble: 100 × 8
 #> # Groups:   age, sex [4]
-#>    area    age   sex    child_labour all_children total_child_labour
-#>    <chr>   <chr> <chr>         <int>        <dbl>              <dbl>
-#>  1 Area 01 5-9   Female           42          368             222365
-#>  2 Area 02 5-9   Female           10           33             222365
-#>  3 Area 03 5-9   Female          112          453             222365
-#>  4 Area 04 5-9   Female          151          354             222365
-#>  5 Area 05 5-9   Female           23          101             222365
-#>  6 Area 06 5-9   Female            3            5             222365
-#>  7 Area 07 5-9   Female            3           14             222365
-#>  8 Area 08 5-9   Female            6           35             222365
-#>  9 Area 09 5-9   Female           14           48             222365
-#> 10 Area 10 5-9   Female          422         1889             222365
-#> # ℹ 190 more rows
-#> # ℹ 2 more variables: total_all_children <dbl>, child_labour_sm <dbl>
+#>    area  age   sex   child_labour all_children prob_child_labour smoothed scaled
+#>    <chr> <chr> <chr>        <int>        <dbl>             <dbl>    <dbl>  <dbl>
+#>  1 Area… 5-9   Fema…          134          372             0.297   0.351   0.414
+#>  2 Area… 5-9   Fema…           14           35             0.297   0.325   0.390
+#>  3 Area… 5-9   Fema…           92          388             0.297   0.236   0.310
+#>  4 Area… 5-9   Fema…           46          345             0.297   0.140   0.223
+#>  5 Area… 5-9   Fema…           25          102             0.297   0.241   0.314
+#>  6 Area… 5-9   Fema…            2            5             0.297   0.252   0.324
+#>  7 Area… 5-9   Fema…            4           13             0.297   0.252   0.324
+#>  8 Area… 5-9   Fema…           10           34             0.297   0.264   0.335
+#>  9 Area… 5-9   Fema…            2           52             0.297   0.0995  0.186
+#> 10 Area… 5-9   Fema…          578         2087             0.297   0.276   0.346
+#> # ℹ 90 more rows
 ```

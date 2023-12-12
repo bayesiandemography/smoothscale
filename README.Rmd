@@ -39,7 +39,9 @@ library(dplyr, warn.conflicts = FALSE)
 syn_census %>%
   inner_join(syn_survey, by = c("age", "sex")) %>%
   group_by(age, sex) %>%
-  mutate(child_labour_sm = smooth_prob(x = child_labour,
-                                       size = all_children))
+  mutate(smoothed = smooth_prob(x = child_labour,
+                                size = all_children),
+	 scaled = scale_prob(unscaled = smoothed,
+	                     target = prob_child_labour))
 ```
 
