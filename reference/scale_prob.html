@@ -28,8 +28,8 @@ such as totals obtained from a national survey."><!-- mathjax --><script src="ht
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/smoothscale-intro.html">Introduction to Package 'smoothscale'</a>
     <a class="dropdown-item" href="../articles/smoothscale-models.html">Statistical Models used for Smoothing and Scaling</a>
+    <a class="dropdown-item" href="../articles/smoothscale-using.html">Using Package 'smoothscale'</a>
   </div>
 </li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
@@ -55,24 +55,26 @@ such as totals obtained from a national survey.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">scale_prob</span><span class="op">(</span><span class="va">x</span>, <span class="va">size</span>, <span class="va">prob_target</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">scale_prob</span><span class="op">(</span><span class="va">prob_report</span>, <span class="va">prob_target</span>, wt <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
-    <dl><dt>x</dt>
-<dd><p>Number of successes in each area
-or population. A numeric vector.</p></dd>
-
-
-<dt>size</dt>
-<dd><p>Number of trials in each area
-or population. A numeric vector.</p></dd>
+    <dl><dt>prob_report</dt>
+<dd><p>Reported probability
+of having the attribute of interest.
+A numeric vector with values between 0 and 1.</p></dd>
 
 
 <dt>prob_target</dt>
 <dd><p>Benchmark probability.
 A number between 0 and 1.</p></dd>
+
+
+<dt>wt</dt>
+<dd><p>Weights to use when calculating
+overall reported probability from
+individual reported probabilities. Optional.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -96,11 +98,16 @@ probabilities.</p>
 <span class="r-in"><span><span class="co">## calculate national prevalence to use as benchmark</span></span></span>
 <span class="r-in"><span><span class="va">prob_national</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">survey</span><span class="op">$</span><span class="va">total_child_labour</span><span class="op">)</span> <span class="op">/</span></span></span>
 <span class="r-in"><span>                   <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">survey</span><span class="op">$</span><span class="va">total_all_children</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Unknown or uninitialised column: `total_child_labour`.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Unknown or uninitialised column: `total_all_children`.</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## calculate direct estimates of area-level probabilities</span></span></span>
+<span class="r-in"><span><span class="va">prob_area</span> <span class="op">&lt;-</span> <span class="va">census</span><span class="op">$</span><span class="va">child_labour</span> <span class="op">/</span> <span class="va">census</span><span class="op">$</span><span class="va">all_children</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## adjust all groups to match benchmark</span></span></span>
-<span class="r-in"><span><span class="va">prob_area</span> <span class="op">&lt;-</span> <span class="fu">scale_prob</span><span class="op">(</span>x <span class="op">=</span> <span class="va">census</span><span class="op">$</span><span class="va">child_labour</span>,</span></span>
-<span class="r-in"><span>                        size <span class="op">=</span> <span class="va">census</span><span class="op">$</span><span class="va">all_children</span>,</span></span>
-<span class="r-in"><span>                        prob_target <span class="op">=</span> <span class="va">prob_national</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">prob_scaled</span> <span class="op">&lt;-</span> <span class="fu">scale_prob</span><span class="op">(</span>prob_report <span class="op">=</span> <span class="va">prob_area</span>,</span></span>
+<span class="r-in"><span>                          prob_target <span class="op">=</span> <span class="va">prob_national</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in check_prob(prob = prob_target, all_equal = TRUE, nm = "prob_target"):</span> `prob_target` has NAs.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## use tidyverse functions to adjust each</span></span></span>
 <span class="r-in"><span><span class="co">## age-sex group to a different total</span></span></span>
@@ -115,30 +122,17 @@ probabilities.</p>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>     intersect, setdiff, setequal, union</span>
 <span class="r-in"><span><span class="va">target</span> <span class="op">&lt;-</span> <span class="va">survey</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>prob_national <span class="op">=</span> <span class="va">total_child_labour</span> <span class="op">/</span> <span class="va">total_all_children</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in mutate(survey, prob_national = total_child_labour/total_all_children):</span> <span style="color: #00BBBB;">ℹ</span> In argument: `prob_national = total_child_labour/total_all_children`.</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Caused by error:</span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> object 'total_child_labour' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">census</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">target</span>, by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"sex"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>prob_area <span class="op">=</span> <span class="va">child_labour</span> <span class="op">/</span> <span class="va">all_children</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">sex</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>prob_area <span class="op">=</span> <span class="fu">scale_prob</span><span class="op">(</span>x <span class="op">=</span> <span class="va">child_labour</span>,</span></span>
-<span class="r-in"><span>                                size <span class="op">=</span> <span class="va">all_children</span>,</span></span>
-<span class="r-in"><span>                                prob_target <span class="op">=</span> <span class="va">prob_national</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 200 × 9</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Groups:   age, sex [4]</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    area    age   sex    child_labour all_children total_child_labour</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> Area 01 5-9   Female           42          368             <span style="text-decoration: underline;">222</span>365</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> Area 02 5-9   Female           10           33             <span style="text-decoration: underline;">222</span>365</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> Area 03 5-9   Female          112          453             <span style="text-decoration: underline;">222</span>365</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> Area 04 5-9   Female          151          354             <span style="text-decoration: underline;">222</span>365</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> Area 05 5-9   Female           23          101             <span style="text-decoration: underline;">222</span>365</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> Area 06 5-9   Female            3            5             <span style="text-decoration: underline;">222</span>365</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> Area 07 5-9   Female            3           14             <span style="text-decoration: underline;">222</span>365</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> Area 08 5-9   Female            6           35             <span style="text-decoration: underline;">222</span>365</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> Area 09 5-9   Female           14           48             <span style="text-decoration: underline;">222</span>365</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> Area 10 5-9   Female          422         <span style="text-decoration: underline;">1</span>889             <span style="text-decoration: underline;">222</span>365</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 190 more rows</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 3 more variables: total_all_children &lt;dbl&gt;, prob_national &lt;dbl&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   prob_area &lt;dbl&gt;</span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>prob_scaled <span class="op">=</span> <span class="fu">scale_prob</span><span class="op">(</span>prob_report <span class="op">=</span> <span class="va">prob_area</span>,</span></span>
+<span class="r-in"><span>                                  prob_target <span class="op">=</span> <span class="va">prob_national</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'target' not found</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
