@@ -70,37 +70,60 @@ check_prior_cases <- function(prior_cases) {
 
 
 ## HAS_TESTS
-#' Check 'prob_target' argument
+#' Check 'prob' argument
 #'
-#' Check that 'prob_target' is a numeric vector where,
-#' if there is more than one element, the elements
-#' are identical. The element(s) must be between
-#' 0 and 1.
-#'
-#' @param prob_target Numeric vector.
+#' @param prob Numeric vector.
+#' @param all_equal Whether elements all need to be equal.
 #' @param nm Name to be used in error messages.
 #'
 #' @returns TRUE, invisibly
 #'
 #' @noRd
-check_prob_target <- function(prob_target, nm) {
-    if (!is.numeric(prob_target))
+check_prob <- function(prob, all_equal, nm) {
+    if (!is.numeric(prob))
         cli::cli_abort(c("{.arg {nm}} is not numeric.",
-                         i = "{.arg {nm}} has class {.cls {class(prob_target)}}."))
-    if (anyNA(prob_target))
+                         i = "{.arg {nm}} has class {.cls {class(prob)}}."))
+    if (anyNA(prob))
         cli::cli_abort("{.arg {nm}} has NAs.")
-    if (any(prob_target < 0))
+    if (any(prob < 0))
         cli::cli_abort("{.arg {nm}} has negative values.")
-    if (any(prob_target > 1))
+    if (any(prob > 1))
         cli::cli_abort("{.arg {nm}} has values greater than 1.")
-    if (identical(length(prob_target), 0L))
+    if (identical(length(prob), 0L))
         cli::cli_abort("{.arg {nm}} has length 0.")
-    if (length(prob_target) > 1L) {
-        is_unequal <- prob_target != prob_target[[1L]]
+    if ((length(prob) > 1L) && all_equal) {
+        is_unequal <- prob != prob[[1L]]
         i_unequal <- match(TRUE, is_unequal, nomatch = 0L)
         if (i_unequal > 0L)
-            cli::cli_abort(paste("Element {i_unequal} of {.arg {nm}} ({prob_target[[i_unequal]]})",
-                                 "not equal to element 1 ({prob_target[[1L]]})."))
+            cli::cli_abort(paste("Element {i_unequal} of {.arg {nm}} ({prob[[i_unequal]]})",
+                                 "not equal to element 1 ({prob[[1L]]})."))
     }
+    invisible(TRUE)
+}
+
+
+## HAS_TESTS
+#' Check 'wt' argument
+#'
+#' @param wt Numeric vector of weights.
+#' @param prob_report Reported probabilities
+#'
+#' @returns TRUE, invisibly
+#'
+#' @noRd
+check_wt <- function(wt, prob_report) {
+    if (!is.numeric(wt))
+        cli::cli_abort(c("{.arg wt} is not numeric.",
+                         i = "{.arg wt} has class {.cls {class(wt)}}."))
+    if (anyNA(wt))
+        cli::cli_abort("{.arg wt} has NAs.")
+    if (any(wt < 0))
+        cli::cli_abort("{.arg wt} has negative values.")
+    if (any(is.infinite(wt)))
+        cli::cli_abort("{.arg wt} has infinite values.")
+    if (!identical(length(wt), length(prob_report)))
+        cli::cli_abort(c("{.arg wt} and {.arg prob_report} have different lengths.",
+                         "{.arg wt} has length {.val {length(wt)}}.",
+                         "{.arg prob_report} has length {.val {length(prob_report)}}."))
     invisible(TRUE)
 }

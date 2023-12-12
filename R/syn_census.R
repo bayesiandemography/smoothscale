@@ -7,9 +7,9 @@
 #' area level.
 #'
 #' @format
-#' A [tibble][tibble::tibble()] with 80 rows and the following columns:
+#' A [tibble][tibble::tibble()] with 100 rows and the following columns:
 #'
-#' - `area`: Geographical area, numbered from 1 to 20
+#' - `area`: Geographical area, numbered from 1 to 25
 #' - `age`: `"5-9" or `"10-14"`
 #' - `sex`: `"Female"` or `"Male"`
 #' - `child_labour`: Number of children involved in

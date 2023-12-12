@@ -28,25 +28,26 @@
 #' @keywords internal
 #' @export
 estimate_alpha_beta <- function(x, size, prior_cases) {
-    keep <- !is.na(x) & !is.na(size) & (size > 0)
-    x <- x[keep]
-    size <- size[keep]
-    n <- length(x)
-    neg_log_post <- function(y) {
-        alpha <- exp(y[[1L]])
-        beta <- exp(y[[2L]])
-        log_lik <- (sum(lbeta(x + alpha, size - x + beta))
-            - n * lbeta(alpha, beta))
-        log_prior <- stats::dcauchy(alpha + beta,
-                                    scale = prior_cases,
-                                    log = TRUE)
-        -1 * (log_lik + log_prior)
-    }
-    val <- stats::optim(par = c(1, 1), fn = neg_log_post)
-    convergence <- val$convergence
-    if (convergence != 0L)
-        cli::cli_abort(c("Optimiser did not converge.",
-                         i = "Convergence code: {convergence}."))
-    c(alpha = exp(val$par[[1L]]),
-      beta = exp(val$par[[2L]]))
+  keep <- !is.na(x) & !is.na(size) & (size > 0)
+  x <- x[keep]
+  size <- size[keep]
+  n <- length(x)
+  neg_log_post <- function(y) {
+    alpha <- exp(y[[1L]])
+    beta <- exp(y[[2L]])
+    log_lik <- (sum(lbeta(x + alpha, size - x + beta))
+      - n * lbeta(alpha, beta))
+    log_prior <- stats::dlnorm(alpha + beta,
+                               meanlog = log(prior_cases),
+                               sdlog = 1,
+                               log = TRUE)
+    -1 * (log_lik + log_prior)
+  }
+  val <- stats::optim(par = c(1, 1), fn = neg_log_post)
+  convergence <- val$convergence
+  if (convergence != 0L)
+    cli::cli_abort(c("Optimiser did not converge.",            # nocovr
+                     i = "Convergence code: {convergence}."))  # nocovr
+  c(alpha = exp(val$par[[1L]]),
+    beta = exp(val$par[[2L]]))
 }

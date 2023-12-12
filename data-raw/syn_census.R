@@ -5,7 +5,7 @@ library(tidyr)
 
 set.seed(0)
 
-n_area <- 50
+n_area <- 25
 mean_area_effect_popn <- 4
 sd_area_effect_popn <- 1.5
 sd_agesex_popn <- 0.05

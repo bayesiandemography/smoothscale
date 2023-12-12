@@ -20,4 +20,11 @@ overall total!
 \strong{smoothscale} also contains a synthetic dataset
 called \link{syn_census}.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://bayesiandemography.github.io/smoothscale/}
+}
+
+}
 \keyword{internal}

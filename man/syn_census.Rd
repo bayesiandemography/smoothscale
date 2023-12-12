@@ -5,9 +5,9 @@
 \alias{syn_census}
 \title{A synthetic census dataset}
 \format{
-A \link[tibble:tibble]{tibble} with 80 rows and the following columns:
+A \link[tibble:tibble]{tibble} with 100 rows and the following columns:
 \itemize{
-\item \code{area}: Geographical area, numbered from 1 to 20
+\item \code{area}: Geographical area, numbered from 1 to 25
 \item \code{age}: \verb{"5-9" or }"10-14"`
 \item \code{sex}: \code{"Female"} or \code{"Male"}
 \item \code{child_labour}: Number of children involved in

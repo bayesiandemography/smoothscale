@@ -1,0 +1,123 @@
+---
+title: "Using Package 'smoothscale'"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Using Package 'smoothscale'}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Introduction
+
+Package **smoothscale** contains functions for doing simple small area estimation with data that has sampling errors and/or measurement errors. This vignette demonstrates the use of the functions, using some synthetic data.
+
+First we load the package.
+
+```{r setup}
+library(smoothscale)
+```
+
+We will be using datasets `syn_census` and `syn_survey`.
+
+```{r}
+syn_census
+```
+The datasets contains synthetic (i.e. fake) data, but the data has a similar structure to real census and survey data.  `syn_census` contains, for each combination of area, age, and sex, counts of children involved in child labour, and counts of all children. `syn_survey` contains estimates of overall probabilities of being involved in child labour, which are assumed to be accurate.
+
+# Function `smooth_prob()`
+
+Function `smooth_prob()` deals with sampling error, which is typically an important problem when doing small area estimation. Function `smooth_prob()` has two main arguments:
+
+- `count` is the count variable that needs to be smoothed, in our case, counts of child labour
+- `size` is the number of respondents from which counts were draw, in our case, counts of all children in the census file.
+
+A 'direct' estimate of the probability that a child is involved in child labour can be produced by simply dividing each area's count of child labour by the number of children,
+```{r}
+direct <- syn_census$child_labour / syn_census$all_children
+summary(direct)
+```
+
+A smoothed version of these estimates can be produced using function `smooth_prob()`:
+```{r}
+smoothed <- smooth_prob(x = syn_census$child_labour,
+                        size = syn_census$all_children)
+summary(smoothed)
+```
+
+Function `smooth_prob()` pulls prevalences (ie counts divided by size) towards the overall average. We know, however, that child labour is likely to vary by age and sex. It would be better to smooth each combination of age and sex towards their own average. 
+
+A convenient way to smooth within combinations of other variables is to use functions contained in the [dplyr](https://dplyr.tidyverse.org) package (part of the[tidyverse](https://www.tidyverse.org).)
+
+```{r}
+library(dplyr)
+smoothed_agesex <- syn_census |>
+  group_by(age, sex) |>
+  mutate(direct = child_labour / all_children,
+         smoothed = smooth_prob(x = child_labour,
+                                size = all_children)) |>
+  ungroup()
+smoothed_agesex
+```
+
+We calculate and plot prevalences, using some more tidyverse packages and functions,
+
+```{r, fig.height = 7, fig.width = 7}
+library(tidyr)
+library(forcats)
+library(ggplot2)
+data_for_plot <- smoothed_agesex |>
+  pivot_longer(col = c(direct, smoothed),
+               names_to = "measure",
+	             values_to = "prob") |>
+  mutate(area = fct_reorder(area, prob))
+ggplot(data_for_plot,
+       aes(x = prob, y = area, color = measure)) +
+  facet_grid(vars(age), vars(sex)) +
+  geom_point() +
+  scale_color_manual(values = c("darkblue", "darkorange"))
+```
+
+
+# Function `scale_prob()`
+
+Function `scale_prob()` deals with measurement error, which also arises often in small area estimation. Function `scale_prob()` has three arguments:
+
+- `prob_report` is the original probability estimate for each area
+- `prob_target` is an overall probability, assumed to be error-free
+- `wt` is an optional weighting variable, used to calculate an overall probability from `prob_report`.
+
+We can use `scale_prob()` to scale the probabilities estimated earlier using `smooth_prob()` so that they match those from `syn_survey` at the national level.
+
+```{r}
+scaled_agesex <- smoothed_agesex |>
+  inner_join(syn_survey) |>
+  group_by(age, sex) |>
+  mutate(scaled = scale_prob(prob_report = smoothed,
+                             prob_target = prob_child_labour)) %>%
+  ungroup()
+scaled_agesex 
+```
+
+We graph the results.
+```{r, fig.height = 7, fig.width = 7}
+data_for_plot_scaled <- scaled_agesex |>
+  pivot_longer(col = c(direct, smoothed, scaled),
+               names_to = "measure",
+	             values_to = "prob") |>
+  mutate(measure = factor(measure, levels = c("direct", "smoothed", "scaled")),
+         area = fct_reorder(area, prob))
+ggplot(data_for_plot_scaled,
+       aes(x = prob, y = area, color = measure)) +
+  facet_grid(vars(age), vars(sex)) +
+  geom_point() +
+  scale_color_manual(values = c("darkblue", "darkorange", "darkgreen"))
+```
+
+

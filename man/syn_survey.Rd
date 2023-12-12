@@ -9,10 +9,8 @@ A \link[tibble:tibble]{tibble} with 4 rows and the following columns:
 \itemize{
 \item \code{age}: \verb{"5-9" or }"10-14"`
 \item \code{sex}: \code{"Female"} or \code{"Male"}
-\item \code{total_child_labour}: Estimated number of children involved in
-child labour in the whole country
-\item \code{total_all_children}: Estimated number of children, including
-those not involved in child labour, in the whole country
+\item \code{prob_child_labour}: Probability that a child
+is involve din child labour. Assumed to be accurate.
 }
 }
 \usage{
@@ -20,8 +18,8 @@ syn_survey
 }
 \description{
 A synthetic (ie made-up) dataset, illustrating the
-sort of ta bulations than can be produced from a survey
-file. The synthetic data measure child labour
+sort of values that can be produced from a survey.
+The synthetic data measure child labour
 at the national level
 }
 \keyword{datasets}

@@ -5,12 +5,14 @@
 #' consistent with pre-specified benchmarks,
 #' such as totals obtained from a national survey.
 #'
-#' @param x Number of successes in each area
-#' or population. A numeric vector.
-#' @param size Number of trials in each area
-#' or population. A numeric vector.
+#' @param prob_report Reported probability
+#' of having the attribute of interest.
+#' A numeric vector with values between 0 and 1.
 #' @param prob_target Benchmark probability.
 #' A number between 0 and 1.
+#' @param wt Weights to use when calculating
+#' overall reported probability from
+#' individual reported probabilities. Optional.
 #'
 #' @returns A numeric vector with scaled
 #' probabilities.
@@ -26,10 +28,12 @@
 #' prob_national <- sum(survey$total_child_labour) /
 #'                    sum(survey$total_all_children)
 #'
+#' ## calculate direct estimates of area-level probabilities
+#' prob_area <- census$child_labour / census$all_children
+#'
 #' ## adjust all groups to match benchmark
-#' prob_area <- scale_prob(x = census$child_labour,
-#'                         size = census$all_children,
-#'                         prob_target = prob_national)
+#' prob_scaled <- scale_prob(prob_report = prob_area,
+#'                           prob_target = prob_national)
 #'
 #' ## use tidyverse functions to adjust each
 #' ## age-sex group to a different total
@@ -39,25 +43,31 @@
 #' 
 #' census |>
 #'   left_join(target, by = c("age", "sex")) |>
+#'   mutate(prob_area = child_labour / all_children) |>
 #'   group_by(age, sex) |>
-#'   mutate(prob_area = scale_prob(x = child_labour,
-#'                                 size = all_children,
-#'                                 prob_target = prob_national))
+#'   mutate(prob_scaled = scale_prob(prob_report = prob_area,
+#'                                   prob_target = prob_national))
 #' @export
-scale_prob <- function(x, size, prob_target) {
-  check_x_size(x = x,
-               size = size,
-               na_ok = FALSE)
-  check_prob_target(prob_target)
+scale_prob <- function(prob_report, prob_target, wt = NULL) {
+  check_prob(prob = prob_report,
+             all_equal = FALSE,
+             nm = "prob_report")
+  check_prob(prob = prob_target,
+             all_equal = TRUE,
+             nm = "prob_target")
   prob_target <- prob_target[[1L]]
-  prob_curr <- sum(x) / sum(size)
-  err <- prob_target - prob_curr
-  prob_direct_vec <- x / size
+  has_wt <- !is.null(wt)
+  if (has_wt) {
+    check_wt(wt = wt, prob_report = prob_report)
+    prob_report_mean <- stats::weighted.mean(prob_report, w = wt)
+  }
+  else
+    prob_report_mean <- mean(prob_report)
+  err <- prob_target - prob_report_mean
   scale_up <- err > 0
   if (scale_up)
-    scale_vec <- (1 - prob_direct_vec) / (1 - prob_curr)
+    scale <- (1 - prob_report) / (1 - prob_report_mean)
   else
-    scale_vec <- prob_direct_vec / prob_curr
-  err_vec <- scale_vec * err
-  prob_direct_vec + err_vec
+    scale <- prob_report / prob_report_mean
+  prob_report + scale * err
 }

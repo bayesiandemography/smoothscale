@@ -4,17 +4,19 @@
 \alias{scale_prob}
 \title{Scale Probabilities}
 \usage{
-scale_prob(x, size, prob_target)
+scale_prob(prob_report, prob_target, wt = NULL)
 }
 \arguments{
-\item{x}{Number of successes in each area
-or population. A numeric vector.}
-
-\item{size}{Number of trials in each area
-or population. A numeric vector.}
+\item{prob_report}{Reported probability
+of having the attribute of interest.
+A numeric vector with values between 0 and 1.}
 
 \item{prob_target}{Benchmark probability.
 A number between 0 and 1.}
+
+\item{wt}{Weights to use when calculating
+overall reported probability from
+individual reported probabilities. Optional.}
 }
 \value{
 A numeric vector with scaled
@@ -34,10 +36,12 @@ survey <- smoothscale::syn_survey
 prob_national <- sum(survey$total_child_labour) /
                    sum(survey$total_all_children)
 
+## calculate direct estimates of area-level probabilities
+prob_area <- census$child_labour / census$all_children
+
 ## adjust all groups to match benchmark
-prob_area <- scale_prob(x = census$child_labour,
-                        size = census$all_children,
-                        prob_target = prob_national)
+prob_scaled <- scale_prob(prob_report = prob_area,
+                          prob_target = prob_national)
 
 ## use tidyverse functions to adjust each
 ## age-sex group to a different total
@@ -47,10 +51,10 @@ target <- survey |>
 
 census |>
   left_join(target, by = c("age", "sex")) |>
+  mutate(prob_area = child_labour / all_children) |>
   group_by(age, sex) |>
-  mutate(prob_area = scale_prob(x = child_labour,
-                                size = all_children,
-                                prob_target = prob_national))
+  mutate(prob_scaled = scale_prob(prob_report = prob_area,
+                                  prob_target = prob_national))
 }
 \seealso{
 \code{\link[=smooth_prob]{smooth_prob()}}
