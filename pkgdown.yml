@@ -4,7 +4,7 @@ pkgdown_sha: ~
 articles:
   smoothscale-models: smoothscale-models.html
   smoothscale-using: smoothscale-using.html
-last_built: 2023-12-12T07:29Z
+last_built: 2023-12-12T09:09Z
 urls:
   reference: https://bayesiandemography.github.io/smoothscale/reference
   article: https://bayesiandemography.github.io/smoothscale/articles
