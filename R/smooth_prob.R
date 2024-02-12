@@ -2,17 +2,18 @@
 ## HAS_TESTS
 #' Smooth Probabilities
 #' 
-#' Calculate probabilities for multiple population.
-#' Given data on the number of 'trials' and 'succession'
+#' Calculate probabilities for multiple populations.
+#' Given data on the number of 'trials' and 'successes'
 #' in each population, calculate the
 #' probability of success in each population.
-#' For instance, given data on the number of respondent,
+#' For instance, given data on the number of respondents,
 #' and number of employed respondents, by area,
 #' calculate the probability of being
 #' employed in each area. The probabilities are smoothed:
 #' the values are shifted towards the overall mean,
 #' with values that are based on small sample sizes being
-#' shifted the furtherst. 
+#' shifted further than values that are based on large
+#' sample sizes. 
 #'
 #' @section Stratifying:
 #'
@@ -44,18 +45,19 @@
 #'
 #' \deqn{\lambda \sim \text{Unif}(0, 1)}
 #'
-#' \deqn{\nu \sim \text{LogNormal}^+(\log M, 1)}
+#' \deqn{\nu \sim \text{LogNormal}(\log M, 1)}
 #'
 #' where
 #'
 #' - \eqn{k} indexes area or population,
 #' - \eqn{x_k} is the number of successes, which is
-#'   specified by argument `x`
+#'   specified by argument `x`,
 #' - \eqn{n_k} is the number of trials, which is
-#'   specified by argument `size`
+#'   specified by argument `size`,
 #' - \eqn{\pi_k} is the probability of success, and
 #' - \eqn{M} control smoothing, and can be
 #'   specified by argument `prior_counts`.
+#' 
 #'
 #' `smooth_prob()` returns \eqn{\hat{\pi}_k}, the
 #' maximum posterior density estimate of \eqn{\pi_k}.
@@ -64,7 +66,8 @@
 #' probability of success is \eqn{x_k / n_k}.
 #'
 #'
-#' For details on the model, see the vignette LINK TO VIGNETTE.
+#' For details on the model, see the vignette
+#' [Statistical Models used for Smoothing and Scaling](https://bayesiandemography.github.io/smoothscale/articles/smoothscale-models.html).
 #'
 #' @param x Number of successes in each population.
 #' A numeric vector.
@@ -73,7 +76,7 @@
 #' @param prior_cases Parameter controlling
 #' smoothing. Default is `10`.
 #'
-#' @returns A numeric vector with the
+#' @returns A numeric vector with
 #' smoothed probabilities.
 #'
 #' @examples

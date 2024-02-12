@@ -4,14 +4,14 @@
 \alias{scale_prob}
 \title{Scale Probabilities}
 \usage{
-scale_prob(unscaled, target, wt = NULL)
+scale_prob(unscaled, benchmark, wt = NULL)
 }
 \arguments{
 \item{unscaled}{Reported probability
 of having the attribute of interest.
 A numeric vector with values between 0 and 1.}
 
-\item{target}{Benchmark probability.
+\item{benchmark}{Benchmark probability.
 A number between 0 and 1.}
 
 \item{wt}{Weights to use when calculating
@@ -32,7 +32,7 @@ set.seed(10)
 p1 <- runif(n = 10)
 p2 <- 0.6
 p1_scaled <- scale_prob(unscaled = p1,
-                        target = p2)
+                        benchmark = p2)
 rbind(p1, p1_scaled)
 mean(p1)
 mean(p1_scaled)
@@ -48,7 +48,7 @@ census |>
   mutate(prob_direct = child_labour / all_children) |>
   group_by(age, sex) |>
   mutate(prob_scaled = scale_prob(unscaled = prob_direct,
-                                  target = prob_child_labour))
+                                  benchmark = prob_child_labour))
 }
 \seealso{
 \code{\link[=smooth_prob]{smooth_prob()}}

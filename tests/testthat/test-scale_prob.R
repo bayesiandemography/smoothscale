@@ -7,9 +7,9 @@ test_that("'scale_prob' works when scaling up", {
   size <- round(runif(n = n_area, min = 5, max = 20))
   x <- rbinom(n = 100, size = size, prob = scale * prob_true)
   unscaled <- x / size
-  ans <- scale_prob(unscaled = unscaled, target = prob_true)
+  ans <- scale_prob(unscaled = unscaled, benchmark = prob_true)
   expect_equal(mean(ans), prob_true, tolerance = 0.01)
-  ans_wt <- scale_prob(unscaled = unscaled, target = prob_true, wt = size)
+  ans_wt <- scale_prob(unscaled = unscaled, benchmark = prob_true, wt = size)
   expect_equal(weighted.mean(ans_wt, w = size), prob_true)
   expect_true(all(ans >= 0))
   expect_true(all(ans <= 1))
@@ -24,7 +24,7 @@ test_that("'scale_prob' works when scaling down", {
   size <- round(runif(n = n_area, min = 5, max = 20))
   x <- rbinom(n = 100, size = size, prob = scale * prob_true)
   unscaled <- x / size
-  ans <- scale_prob(unscaled, target = prob_true, wt = size)
+  ans <- scale_prob(unscaled, benchmark = prob_true, wt = size)
   expect_equal(weighted.mean(ans, w = size), prob_true)
   expect_true(all(ans >= 0))
   expect_true(all(ans <= 1))

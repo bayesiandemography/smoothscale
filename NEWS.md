@@ -1,3 +1,6 @@
-# smoothscale 0.1.0
+# smoothscale 0.1.1
 
-* Initial CRAN submission.
+## Interface
+
+- Renamed `target` argument of `scale_prob()` to `benchmark`.
+- Revised vignettes

@@ -8,7 +8,7 @@
 #' @param unscaled Reported probability
 #' of having the attribute of interest.
 #' A numeric vector with values between 0 and 1.
-#' @param target Benchmark probability.
+#' @param benchmark Benchmark probability.
 #' A number between 0 and 1.
 #' @param wt Weights to use when calculating
 #' overall unscaled probability from
@@ -24,7 +24,7 @@
 #' p1 <- runif(n = 10)
 #' p2 <- 0.6
 #' p1_scaled <- scale_prob(unscaled = p1,
-#'                         target = p2)
+#'                         benchmark = p2)
 #' rbind(p1, p1_scaled)
 #' mean(p1)
 #' mean(p1_scaled)
@@ -40,16 +40,16 @@
 #'   mutate(prob_direct = child_labour / all_children) |>
 #'   group_by(age, sex) |>
 #'   mutate(prob_scaled = scale_prob(unscaled = prob_direct,
-#'                                   target = prob_child_labour))
+#'                                   benchmark = prob_child_labour))
 #' @export
-scale_prob <- function(unscaled, target, wt = NULL) {
+scale_prob <- function(unscaled, benchmark, wt = NULL) {
   check_prob(prob = unscaled,
              all_equal = FALSE,
              nm = "unscaled")
-  check_prob(prob = target,
+  check_prob(prob = benchmark,
              all_equal = TRUE,
-             nm = "target")
-  target <- target[[1L]]
+             nm = "benchmark")
+  benchmark <- benchmark[[1L]]
   has_wt <- !is.null(wt)
   if (has_wt) {
     check_wt(wt = wt, unscaled = unscaled)
@@ -57,7 +57,7 @@ scale_prob <- function(unscaled, target, wt = NULL) {
   }
   else
     unscaled_mean <- mean(unscaled)
-  err <- target - unscaled_mean
+  err <- benchmark - unscaled_mean
   scale_up <- err > 0
   if (scale_up)
     scale <- (1 - unscaled) / (1 - unscaled_mean)

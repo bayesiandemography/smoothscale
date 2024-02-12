@@ -27,4 +27,13 @@ Useful links:
 }
 
 }
+\author{
+\strong{Maintainer}: John Bryant \email{john@bayesiandemography.com}
+
+Authors:
+\itemize{
+  \item Tom Wilson \email{advanceddemographicmodelling@gmail.com}
+}
+
+}
 \keyword{internal}

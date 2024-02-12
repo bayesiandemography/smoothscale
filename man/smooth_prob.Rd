@@ -17,21 +17,22 @@ A numeric vector.}
 smoothing. Default is \code{10}.}
 }
 \value{
-A numeric vector with the
+A numeric vector with
 smoothed probabilities.
 }
 \description{
-Calculate probabilities for multiple population.
-Given data on the number of 'trials' and 'succession'
+Calculate probabilities for multiple populations.
+Given data on the number of 'trials' and 'successes'
 in each population, calculate the
 probability of success in each population.
-For instance, given data on the number of respondent,
+For instance, given data on the number of respondents,
 and number of employed respondents, by area,
 calculate the probability of being
 employed in each area. The probabilities are smoothed:
 the values are shifted towards the overall mean,
 with values that are based on small sample sizes being
-shifted the furtherst.
+shifted further than values that are based on large
+sample sizes.
 }
 \section{Stratifying}{
 
@@ -68,15 +69,15 @@ The smoothing is based on the model
 
 \deqn{\lambda \sim \text{Unif}(0, 1)}
 
-\deqn{\nu \sim \text{LogNormal}^+(\log M, 1)}
+\deqn{\nu \sim \text{LogNormal}(\log M, 1)}
 
 where
 \itemize{
 \item \eqn{k} indexes area or population,
 \item \eqn{x_k} is the number of successes, which is
-specified by argument \code{x}
+specified by argument \code{x},
 \item \eqn{n_k} is the number of trials, which is
-specified by argument \code{size}
+specified by argument \code{size},
 \item \eqn{\pi_k} is the probability of success, and
 \item \eqn{M} control smoothing, and can be
 specified by argument \code{prior_counts}.
@@ -88,7 +89,8 @@ maximum posterior density estimate of \eqn{\pi_k}.
 The "direct" (unsmoothed) estimate of the
 probability of success is \eqn{x_k / n_k}.
 
-For details on the model, see the vignette LINK TO VIGNETTE.
+For details on the model, see the vignette
+\href{https://bayesiandemography.github.io/smoothscale/articles/smoothscale-models.html}{Statistical Models used for Smoothing and Scaling}.
 }
 
 \examples{

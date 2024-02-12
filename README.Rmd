@@ -42,6 +42,6 @@ syn_census |>
   mutate(smoothed = smooth_prob(x = child_labour,
                                 size = all_children),
          scaled = scale_prob(unscaled = smoothed,
-                             target = prob_child_labour))
+                             benchmark = prob_child_labour))
 ```
 

@@ -90,7 +90,7 @@ ggplot(data_for_plot,
 Function `scale_prob()` deals with measurement error, which also arises often in small area estimation. Function `scale_prob()` has three arguments:
 
 - `unscaled` is the original probability estimate for each area
-- `target` is an overall probability, assumed to be error-free
+- `benchmark` is an overall probability, assumed to be error-free
 - `wt` is an optional weighting variable, used to calculate an overall probability from `unscaled`.
 
 We can use `scale_prob()` to scale the probabilities estimated earlier using `smooth_prob()` so that they match those from `syn_survey` at the national level.
@@ -100,7 +100,7 @@ scaled_agesex <- smoothed_agesex |>
   inner_join(syn_survey) |>
   group_by(age, sex) |>
   mutate(scaled = scale_prob(unscaled = smoothed,
-                             target = prob_child_labour)) %>%
+                             benchmark = prob_child_labour)) %>%
   ungroup()
 scaled_agesex 
 ```

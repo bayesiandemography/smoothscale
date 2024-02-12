@@ -76,8 +76,8 @@ test_that("'check_prior_cases' raises correct error with negative", {
 ## 'check_prob' ---------------------------------------------------------------
 
 test_that("'check_prob' returns TRUE with valid inputs", {
-  expect_true(check_prob(c(0.5, 0.5, 0.5), all_equal = TRUE, nm = "target"))
-  expect_true(check_prob(0, nm = "target"))
+  expect_true(check_prob(c(0.5, 0.5, 0.5), all_equal = TRUE, nm = "benchmark"))
+  expect_true(check_prob(0, nm = "benchmark"))
 })
 
 test_that("'check_prob' returns TRUE with varying values if 'all_equal' is FALSE", {
@@ -85,33 +85,33 @@ test_that("'check_prob' returns TRUE with varying values if 'all_equal' is FALSE
 })
 
 test_that("'check_prob' raises correct error with non-numeric", {
-  expect_error(check_prob("a", all_equal = TRUE, nm = "target"),
-               "`target` is not numeric.")
+  expect_error(check_prob("a", all_equal = TRUE, nm = "benchmark"),
+               "`benchmark` is not numeric.")
 })
 
 test_that("'check_prob' raises correct error with NA", {
-  expect_error(check_prob(NA_real_, all_equal = TRUE, nm = "target"),
-               "`target` has NAs.")
+  expect_error(check_prob(NA_real_, all_equal = TRUE, nm = "benchmark"),
+               "`benchmark` has NAs.")
 })
 
 test_that("'check_prob' raises correct error with negative", {
-  expect_error(check_prob(-1, all_equal = TRUE, nm = "target"),
-               "`target` has negative values.")
+  expect_error(check_prob(-1, all_equal = TRUE, nm = "benchmark"),
+               "`benchmark` has negative values.")
 })
 
 test_that("'check_prob' raises correct error with greater than 1", {
-  expect_error(check_prob(2, all_equal = TRUE, nm = "target"),
-               "`target` has values greater than 1.")
+  expect_error(check_prob(2, all_equal = TRUE, nm = "benchmark"),
+               "`benchmark` has values greater than 1.")
 })
 
 test_that("'check_prob' raises correct error with length 0", {
-  expect_error(check_prob(numeric(), all_equal = TRUE, nm = "target"),
-               "`target` has length 0.")
+  expect_error(check_prob(numeric(), all_equal = TRUE, nm = "benchmark"),
+               "`benchmark` has length 0.")
 })
 
 test_that("'check_prob' raises correct error with unequal values", {
-  expect_error(check_prob(c(1, 1, 1, 0.2), all_equal = TRUE, nm = "target"),
-               "Element 4 of `target` \\(0.2\\) not equal to element 1 \\(1\\).")
+  expect_error(check_prob(c(1, 1, 1, 0.2), all_equal = TRUE, nm = "benchmark"),
+               "Element 4 of `benchmark` \\(0.2\\) not equal to element 1 \\(1\\).")
 })
 
 

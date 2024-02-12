@@ -32,7 +32,7 @@ syn_census |>
   mutate(smoothed = smooth_prob(x = child_labour,
                                 size = all_children),
          scaled = scale_prob(unscaled = smoothed,
-                             target = prob_child_labour))
+                             benchmark = prob_child_labour))
 #> # A tibble: 100 × 8
 #> # Groups:   age, sex [4]
 #>    area  age   sex   child_labour all_children prob_child_labour smoothed scaled
