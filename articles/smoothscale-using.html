@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">smoothscale</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -44,6 +44,9 @@
     <a class="dropdown-item" href="../articles/smoothscale-models.html">Statistical Models used for Smoothing and Scaling</a>
     <a class="dropdown-item" href="../articles/smoothscale-using.html">Using Package 'smoothscale'</a>
   </div>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="../news/index.html">Changelog</a>
 </li>
       </ul>
 <form class="form-inline my-2 my-lg-0" role="search">
@@ -203,7 +206,7 @@ which also arises often in small area estimation. Function
 <code>unscaled</code> is the original probability estimate for each
 area</li>
 <li>
-<code>target</code> is an overall probability, assumed to be
+<code>benchmark</code> is an overall probability, assumed to be
 error-free</li>
 <li>
 <code>wt</code> is an optional weighting variable, used to calculate
@@ -217,7 +220,7 @@ those from <code>syn_survey</code> at the national level.</p>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">inner_join</a></span><span class="op">(</span><span class="va">syn_survey</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">sex</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>scaled <span class="op">=</span> <span class="fu"><a href="../reference/scale_prob.html">scale_prob</a></span><span class="op">(</span>unscaled <span class="op">=</span> <span class="va">smoothed</span>,</span>
-<span>                             target <span class="op">=</span> <span class="va">prob_child_labour</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>                             benchmark <span class="op">=</span> <span class="va">prob_child_labour</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Joining with `by = join_by(age, sex)`</span></span>
 <span><span class="va">scaled_agesex</span> </span>

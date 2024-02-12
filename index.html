@@ -30,7 +30,7 @@
     
     <a class="navbar-brand me-2" href="index.html">smoothscale</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,6 +48,9 @@
     <a class="dropdown-item" href="articles/smoothscale-models.html">Statistical Models used for Smoothing and Scaling</a>
     <a class="dropdown-item" href="articles/smoothscale-using.html">Using Package 'smoothscale'</a>
   </div>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="news/index.html">Changelog</a>
 </li>
       </ul>
 <form class="form-inline my-2 my-lg-0" role="search">
@@ -86,7 +89,7 @@
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>smoothed <span class="op">=</span> <span class="fu"><a href="reference/smooth_prob.html">smooth_prob</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">child_labour</span>,</span>
 <span>                                size <span class="op">=</span> <span class="va">all_children</span><span class="op">)</span>,</span>
 <span>         scaled <span class="op">=</span> <span class="fu"><a href="reference/scale_prob.html">scale_prob</a></span><span class="op">(</span>unscaled <span class="op">=</span> <span class="va">smoothed</span>,</span>
-<span>                             target <span class="op">=</span> <span class="va">prob_child_labour</span><span class="op">)</span><span class="op">)</span></span>
+<span>                             benchmark <span class="op">=</span> <span class="va">prob_child_labour</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 100 × 8</span></span>
 <span><span class="co">#&gt; # Groups:   age, sex [4]</span></span>
 <span><span class="co">#&gt;    area  age   sex   child_labour all_children prob_child_labour smoothed scaled</span></span>

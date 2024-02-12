@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">smoothscale</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -44,6 +44,9 @@
     <a class="dropdown-item" href="../articles/smoothscale-models.html">Statistical Models used for Smoothing and Scaling</a>
     <a class="dropdown-item" href="../articles/smoothscale-using.html">Using Package 'smoothscale'</a>
   </div>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="../news/index.html">Changelog</a>
 </li>
       </ul>
 <form class="form-inline my-2 my-lg-0" role="search">
@@ -76,12 +79,10 @@
 </h2>
 <p>The <strong>smoothscale</strong> package provides functions for
 estimating counts and prevalences in small populations. The functions
-deal with two of the problems that often arise when doing this sort of
-estimation: sampling errors and measurement errors. Statisticans have
-developed many methods for estimation in small populations, under the
-headings of “small area estimation” <span class="citation">(Rao and
-Molina 2015)</span>. Many of these methods are complex, and require
-specialist statistical skills. The methods used in
+deal with two common problems: sampling errors and measurement errors.
+Statisticans have developed many methods for estimation in small
+populations, under the headings of “small area estimation” <span class="citation">(Rao and Molina 2015)</span>. Many of these methods are
+complex, and require specialist statistical skills. The methods used in
 <strong>smoothscale</strong> are, in contrast, deliberately simple.</p>
 <p>This vignette defines sampling and measurement errors, and describes
 how they are dealt with by functions in <strong>smoothscale</strong>.
@@ -99,14 +100,14 @@ between sampling and measurement errors.</p>
 employment or school attendance, in each of <span class="math inline">\(k = 1, \dots, K\)</span> small areas. We are
 interested in absolute numbers and in underlying probabilities.</p>
 <p>We have data on <span class="math inline">\(n_k\)</span> people from
-each area. The number of people in each area who are reported to have
-the attribute in question is <span class="math inline">\(x_k\)</span>.
-In the following hypothetical data, for instance, <span class="math inline">\(n_k\)</span> is the number of respondents in each
-distribution, and <span class="math inline">\(x_k\)</span> is the number
-of respondents who attend school:</p>
+each area, including the number, <span class="math inline">\(x_k\)</span>, of people who are reported to have
+the attribute in question. In the following hypothetical data, for
+instance, <span class="math inline">\(n_k\)</span> is the number of
+respondents in each area, and <span class="math inline">\(x_k\)</span>
+is the number of respondents who attend school:</p>
 <table class="table">
 <thead><tr class="header">
-<th align="left">District</th>
+<th align="left">Area</th>
 <th align="center">Respondents</th>
 <th align="center">Respondents attending school</th>
 </tr></thead>
@@ -138,16 +139,16 @@ number of repondents may be approximately equal to size of the target
 population in each area. The number of children captured in the census,
 for instance, should be close to the actual number of children living in
 an area.</p>
-<p>If, however, the data come from a sample extracted from the census,
-then the number of respondents is likely to be much smaller than the
-number of people in the target population. In this case, to estimate
-counts of people with the attribute in each area, we need an additional
-set of data, <span class="math inline">\(N_k\)</span>, <span class="math inline">\(k = 1, \cdots, K\)</span>, on the size of the
-target population in each area. Data on a target population of
-school-age children, for instance, might look like this:</p>
+<p>If, however, the data come from a survey, then the number of
+respondents is likely to be much smaller than the number of people in
+the target population. In this case, to estimate counts of people with
+the attribute in each area, we need an additional set of data, <span class="math inline">\(N_k\)</span>, <span class="math inline">\(k = 1,
+\cdots, K\)</span>, on the size of the target population in each area.
+Data on a target population of school-age children, for instance, might
+look like this:</p>
 <table class="table">
 <thead><tr class="header">
-<th align="left">District</th>
+<th align="left">Area</th>
 <th align="center">Total school-age children</th>
 </tr></thead>
 <tbody>
@@ -186,11 +187,12 @@ reflects</p>
 <li>random error.</li>
 </ol>
 <p>In small populations, it can be essential to distinguish between an
-observed proportion and an underlyign propensity. Consider, for
-instance, a population of 10 people in which, during a given yer, no one
-dies. The observed proportion of people dying for that year is zero.
-However the underlying propensity – the risk of dying that people in
-fact faced during the year – was not zero.</p>
+observed proportion and an underlying propensity. Consider, for
+instance, a population of 10 people in which, during a given year, no
+one dies. The observed proportion of people dying for that year is zero.
+However, assuming the people are mortal, the underlying propensity – the
+risk of dying that people in fact faced during the year – is not
+zero.</p>
 <p>In large populations, random errors tend to cancel out, so that
 observed counts can be reliable indicators of underlying propensities.
 In small populations, there is much less scope for cancellation, so that
@@ -204,7 +206,7 @@ values and propensities.</p>
 <p>Function <code><a href="../reference/smooth_prob.html">smooth_prob()</a></code> produces smoothed estimates that
 try to strip out the effects of random variation. The model draws on
 ideas from Bayesian statistics <span class="citation">(Gelman et al.
-2014)</span>, but in contrast to a fully Bayesian analysis,
+2014)</span>, though, in contrast to a fully Bayesian analysis,
 <code><a href="../reference/smooth_prob.html">smooth_prob()</a></code> only yields point estimates.</p>
 <p>The estimates are based on a statistical model. The number of people
 in area <span class="math inline">\(k\)</span> with the attribute of
@@ -236,18 +238,20 @@ number of small areas and the population of each area is small. Placing
 a soft constraint on <span class="math inline">\(\nu\)</span> does,
 however, help stabilise estimates at reasonable values when counts are
 small.</p>
-<p>Fitted values for <span class="math inline">\(\lambda\)</span> and
-<span class="math inline">\(\nu\)</span> can be obtained by finding the
-values that maximise the quantity <span class="math display">\[\begin{equation}
+<p>Fitted values <span class="math inline">\(\hat{\lambda}\)</span> and
+<span class="math inline">\(\hat{\nu}\)</span> can be obtained by
+finding the values that maximise the quantity <span class="math display">\[\begin{equation}
   \prod_{k=1}^K \text{BetaBinom}(x_k | n_k, \lambda \nu, (1 - \lambda)
 \nu) \text{LogNormal}(\nu | \log 10, 1).
 \end{equation}\]</span> This quantity is proportional to the posterior
 distribution, or, in non-Bayesian terms, to the penalised likelihood.
 See <span class="citation">Wikipedia contributors (2023a)</span> on the
-definition of the beta-binomial distribution. Values for the <span class="math inline">\(\pi_k\)</span> can then be derived using the
-properties of the binomial and beta distributions <span class="citation">(Wikipedia contributors 2023b)</span>. The fitted value
+definition of the beta-binomial distribution. After the maximization,
+values for the <span class="math inline">\(\pi_k\)</span> can be derived
+using the properties of the binomial and beta distributions <span class="citation">(Wikipedia contributors 2023b)</span>. The fitted value
 for <span class="math inline">\(\pi_k\)</span> is <span class="math display">\[\begin{equation}
-  \hat{\pi}_k = \frac{x_k + \lambda \nu}{n_k + \nu} (\#eq:pihat)
+  \hat{\pi}_k = \frac{x_k + \hat{\lambda} \hat{\nu}}{n_k + \hat{\nu}}
+(\#eq:pihat)
 \end{equation}\]</span></p>
 <p>A smoothed value for the number of people with the attribute is then
 <span class="math inline">\(\hat{\pi}_k N_k\)</span>, or, when the data
@@ -299,28 +303,28 @@ measurement error. Measurement error can occur, for instance, when
 respondents misunderstand the question, when proxy respondents were
 used, or when the definitions used in the data are different from the
 ones required by the analysis.</p>
-<p>Accounting for measurement errors normally requires some sort of
-additional data on the true underlying values. Function
-<code><a href="../reference/scale_prob.html">scale_prob()</a></code>, the function <strong>smoothscale</strong>
-that deals with measurement error, requires reliable data on
-national-level prevalences. A typical source of reliable national-level
-data is household surveys. Although household surveys do not have large
-enough samples to provide stable estimates for small areas, they do
-typically have large enough samples to provide stable estimates at the
-national level, while also having relatively low measurement errors.</p>
+<p>One way of dealing with measurement error is to constrain small area
+estimates to agree with aggregate ‘benchmark’ values that are assumed to
+be accurate <span class="citation">(Bell, Datta, and Ghosh 2013; Zhang
+and Bryant 2020)</span>. Function <code><a href="../reference/scale_prob.html">scale_prob()</a></code> takes this
+approach. A typical source of reliable aggregate-level data is household
+surveys. Although household surveys do not have large enough samples to
+provide stable estimates for small areas, they do typically have large
+enough samples to provide stable estimates at the national level, while
+also having relatively low measurement errors.</p>
 </div>
 <div class="section level3">
 <h3 id="model">Model<a class="anchor" aria-label="anchor" href="#model"></a>
 </h3>
-<p>Let <span class="math inline">\(p_k\)</span> be an initial estimate
+<p>Let <span class="math inline">\(p_k\)</span> be an unscaled estimate
 of the probability that a person in area <span class="math inline">\(k\)</span> possesses the attribute in question. We
-think that <span class="math inline">\(p_k\)</span> differs from the
+assume that <span class="math inline">\(p_k\)</span> differs from the
 true value <span class="math inline">\(\pi_k\)</span> because of
 measurement error, that is, <span class="math display">\[\begin{equation}
   \pi_k = p_k + \epsilon_k,
 \end{equation}\]</span> where <span class="math inline">\(\epsilon_k\)</span> is an area-level measurement
 error. To estimate <span class="math inline">\(\pi_k\)</span>, we need a
-way of estimating <span class="math inline">\(\text{epsilon}_k\)</span>.</p>
+way of estimating <span class="math inline">\(\epsilon_k\)</span>.</p>
 <p>Let <span class="math display">\[\begin{equation}
   w_k = \frac{N_k}{\sum_{k=1}^K N_k} \quad \text{or} \quad
 \frac{n_k}{\sum_{k=1}^K n_k}, \quad k = 1, \cdots, K,
@@ -330,9 +334,8 @@ way of estimating <span class="math inline">\(\text{epsilon}_k\)</span>.</p>
 averaging the initial area-level estimates, and let <span class="math display">\[\begin{equation}
   \bar{\pi} = \sum_{k=1}^K w_k \pi_k
 \end{equation}\]</span> be the true national-level probability.</p>
-<p>We can obtain an accurate estimate of <span class="math inline">\(\hat{\pi}\)</span> from, for instance, a
-national-level survey, though we do know the individual <span class="math inline">\(\pi_k\)</span>. From the national estimate, we can
-calculate the average error, <span class="math display">\[\begin{equation}
+<p>We obtain an accurate estimate of <span class="math inline">\(\bar{\pi}\)</span> from, for instance, a
+national-level survey. Using <span class="math inline">\(\bar{\pi}\)</span>, we can calculate error <span class="math display">\[\begin{equation}
   \bar{\epsilon} = \sum_{k=1}^K w_k \epsilon_k = \sum_{k=1}^K w_k (\pi_k
 - p_k) = \sum_{k=1}^K w_k \pi_k - \sum_{k=1}^K w_k p_k = \bar{\pi} -
 \bar{p}. (\#eq:epsilon)
@@ -353,7 +356,7 @@ scale downwards): <span class="math display">\[\begin{equation}
     \end{cases}
 \end{equation}\]</span> The scaling factor <span class="math inline">\(\alpha_k\)</span> is irrelevant if <span class="math inline">\(\bar{\epsilon} = 0\)</span>, in which case no
 scaling is necessary.</p>
-<p>When the national-level error <span class="math inline">\(\bar{\epsilon}\)</span> is positive, the <span class="math inline">\(\alpha_k\)</span> are all non-negative, and <span class="math inline">\(\pi_k\)</span> is always greater than or equal to
+<p>When national-level error <span class="math inline">\(\bar{\epsilon}\)</span> is positive, the <span class="math inline">\(\alpha_k\)</span> are all non-negative, and <span class="math inline">\(\pi_k\)</span> is always greater than or equal to
 <span class="math inline">\(p_k\)</span>. Conversely, when <span class="math inline">\(\bar{\epsilon}\)</span> is negative, the <span class="math inline">\(\alpha_k\)</span> are all non-positive, and <span class="math inline">\(\pi_k\)</span> is always less than than or equal
 to <span class="math inline">\(p_k\)</span>.</p>
 <p>The <code><a href="../reference/scale_prob.html">scale_prob()</a></code> estimator for <span class="math inline">\(\pi_k\)</span> passes some basic sanity
@@ -395,7 +398,7 @@ data disaggregated by age and sex might look like this:</p>
 <col width="38%">
 </colgroup>
 <thead><tr class="header">
-<th>District</th>
+<th>Area</th>
 <th>Age</th>
 <th>Sex</th>
 <th align="center">All Children</th>
@@ -499,13 +502,13 @@ might like this:</p>
 </tbody>
 </table>
 <p><strong>smoothscale</strong> takes a simple approach to
-disaggregated: estimates are constructed completely independently for
-each combination of the stratifying variables. For instance, with the
-data above, estimates would be constructed separately for 5-9 year old
+disaggregation: estimates are constructed independently for each
+combination of the stratifying variables. For instance, with the data
+above, estimates would be constructed separately for 5-9 year old
 females, 5-9 year old males, 10-14 year old females, and 10-14 year old
 males. Although there might be some gains in accuracy or stability from
 sharing information across combinations of variables, this would mean
-sacrificing simplicity and usability.</p>
+sacrificing simplicity.</p>
 </div>
 <div class="section level2">
 <h2 id="combinations-of-sampling-and-measurement-error">Combinations of sampling and measurement error<a class="anchor" aria-label="anchor" href="#combinations-of-sampling-and-measurement-error"></a>
@@ -517,13 +520,12 @@ data are subject to substantial sampling error <em>and</em> measurement
 error?</p>
 <p>In principle, there might be advantages to modelling sampling error
 and measurement error simultaneously. However, doing so would require
-extra assumptions about the nature of the measurement errors, and the
-ways that these interacted with sample size.</p>
+deriving extra assumptions about the nature of the measurement errors,
+and the ways that these interacted with sample size, which would
+typically be difficult and somewhat arbitrary.</p>
 <p>The recommended approach with <strong>smoothscale</strong> is instead
 to use <code><a href="../reference/smooth_prob.html">smooth_prob()</a></code> to deal with sampling error, and then
-use <code><a href="../reference/scale_prob.html">scale_prob()</a></code> to deal with measurement error. This
-approach is much simpler, and given the difficulty of formulating
-assuptions about measurement errors, is probably just as accurate.</p>
+use <code><a href="../reference/scale_prob.html">scale_prob()</a></code> to deal with measurement error.</p>
 </div>
 <div class="section level2">
 <h2 id="appendix-sanity-checks-for-scale_prob-estimator">Appendix: Sanity checks for <code>scale_prob()</code> estimator<a class="anchor" aria-label="anchor" href="#appendix-sanity-checks-for-scale_prob-estimator"></a>
@@ -532,10 +534,10 @@ assuptions about measurement errors, is probably just as accurate.</p>
 never greater than 1, since <span class="math display">\[\begin{equation}
   \pi_k = p_k + \frac{1 - p_k}{1 - \bar{p}} (\bar{\pi} - \bar{p}) \le
 p_k + \frac{1 - p_k}{1 - \bar{p}} (1 - \bar{p}) = p_k + 1 - p_k = 1.
-\end{equation}\]</span> Similarly, when adjusting dowwards, <span class="math inline">\(\pi_k\)</span> is less never than 0, since <span class="math display">\[\begin{equation}
+\end{equation}\]</span> Similarly, when adjusting downwards, <span class="math inline">\(\pi_k\)</span> is less never than 0, since <span class="math display">\[\begin{equation}
   \pi_k = p_k + \frac{p_k}{\bar{p}} (\bar{\pi} - \bar{p}) \ge p_k +
 \frac{p_k}{\bar{p}} (-\bar{p}) = p_k - p_k = 0.
-\end{equation}\]</span> In addition, when adusting upwards, <span class="math display">\[\begin{equation}
+\end{equation}\]</span> Moreoever, when adusting upwards, <span class="math display">\[\begin{equation}
    \sum_{k=1}^K w_k \epsilon_k = \sum_{k=1}^K w_k \frac{1 - p_k}{1 -
 \bar{p}} \bar{\epsilon} = \frac{1 - \bar{p}}{1 - \bar{p}} \bar{\epsilon}
 = \bar{\epsilon},
@@ -549,6 +551,11 @@ p_k + \frac{1 - p_k}{1 - \bar{p}} (1 - \bar{p}) = p_k + 1 - p_k = 1.
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
 <div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-bell2013benchmarking" class="csl-entry">
+Bell, William R, Gauri S Datta, and Malay Ghosh. 2013.
+<span>“Benchmarking Small Area Estimators.”</span> <em>Biometrika</em>
+100 (1): 189–202.
+</div>
 <div id="ref-gelman2014bayesian" class="csl-entry">
 Gelman, A., J. B. Carlin, H. S. Stern, D. B. and Dunson, A. Vehtari, and
 D. B. Rubin. 2014. <em>Bayesian Data Analysis. Third Edition</em>. New
@@ -565,6 +572,11 @@ Wikipedia contributors. 2023a. <span>“Beta-Binomial Distribution —
 <div id="ref-enwiki:1167875362" class="csl-entry">
 ———. 2023b. <span>“Conjugate Prior —
 <span>Wikipedia</span><span>,</span> the Free Encyclopedia.”</span> <a href="https://en.wikipedia.org/w/index.php?title=Conjugate_prior&amp;oldid=1167875362" class="external-link">https://en.wikipedia.org/w/index.php?title=Conjugate_prior&amp;oldid=1167875362</a>.
+</div>
+<div id="ref-zhang2020fully" class="csl-entry">
+Zhang, Junni L, and John Bryant. 2020. <span>“Fully Bayesian
+Benchmarking of Small Area Estimation Models.”</span> <em>Journal of
+Official Statistics</em> 36 (1): 197–223.
 </div>
 </div>
 </div>
